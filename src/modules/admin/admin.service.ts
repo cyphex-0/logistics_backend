@@ -1,7 +1,7 @@
 import { userRepository } from '../user/user.repository.js';
 import { auditService } from '../audit/audit.service.js';
 import { prisma } from '../../shared/prisma/client.js';
-import { redis } from '../../shared/utils/cache.js';
+import { getOrSetCache } from '../../shared/utils/cache.js';
 import { NotFoundError, BusinessRuleError } from '../../shared/errors/index.js';
 import { Role, ShipmentStatus } from '../../generated/prisma/index.js';
 import { AUDIT_ENTITIES, AUDIT_ACTIONS } from '../../shared/constants/audit-actions.js';
@@ -21,7 +21,10 @@ export class AdminService {
     const user = await userRepository.findById(id);
     if (!user) throw new NotFoundError('User not found');
     
-    if (user.role === role) return user;
+    if (user.role === role) {
+      const publicUser = await userRepository.findPublicById(id);
+      return publicUser;
+    }
 
     const updatedUser = await userRepository.updateRole(id, role);
 
@@ -64,50 +67,40 @@ export class AdminService {
   }
 
   async dashboardStats() {
-    const cacheKey = 'admin_dashboard_stats';
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+    return getOrSetCache('admin_dashboard_stats', 300, async () => {
+      const [
+        totalUsers,
+        totalCouriers,
+        totalShipments,
+        pendingShipments,
+        inTransitShipments,
+        deliveredShipments,
+        totalRevenueData
+      ] = await Promise.all([
+        prisma.user.count({ where: { role: Role.CUSTOMER } }),
+        prisma.user.count({ where: { role: Role.COURIER } }),
+        prisma.shipment.count(),
+        prisma.shipment.count({ where: { status: ShipmentStatus.PENDING } }),
+        prisma.shipment.count({ where: { status: ShipmentStatus.IN_TRANSIT } }),
+        prisma.shipment.count({ where: { status: ShipmentStatus.DELIVERED } }),
+        prisma.payment.aggregate({
+          _sum: { amount: true },
+          where: { status: 'PAID' }
+        })
+      ]);
 
-    // Promise.all to fetch stats concurrently
-    const [
-      totalUsers,
-      totalCouriers,
-      totalShipments,
-      pendingShipments,
-      inTransitShipments,
-      deliveredShipments,
-      totalRevenueData
-    ] = await Promise.all([
-      prisma.user.count({ where: { role: Role.CUSTOMER } }),
-      prisma.user.count({ where: { role: Role.COURIER } }),
-      prisma.shipment.count(),
-      prisma.shipment.count({ where: { status: ShipmentStatus.PENDING } }),
-      prisma.shipment.count({ where: { status: ShipmentStatus.IN_TRANSIT } }),
-      prisma.shipment.count({ where: { status: ShipmentStatus.DELIVERED } }),
-      prisma.payment.aggregate({
-        _sum: { amount: true },
-        where: { status: 'PAID' }
-      })
-    ]);
-
-    const stats = {
-      totalCustomers: totalUsers,
-      totalCouriers,
-      totalShipments,
-      shipmentsByStatus: {
-        pending: pendingShipments,
-        inTransit: inTransitShipments,
-        delivered: deliveredShipments
-      },
-      totalRevenue: totalRevenueData._sum.amount || 0
-    };
-
-    // Cache for 5 minutes
-    await redis.set(cacheKey, JSON.stringify(stats), 'EX', 300);
-
-    return stats;
+      return {
+        totalCustomers: totalUsers,
+        totalCouriers,
+        totalShipments,
+        shipmentsByStatus: {
+          pending: pendingShipments,
+          inTransit: inTransitShipments,
+          delivered: deliveredShipments
+        },
+        totalRevenue: totalRevenueData._sum.amount || 0
+      };
+    });
   }
 
   async listAuditLogs(query: any) {

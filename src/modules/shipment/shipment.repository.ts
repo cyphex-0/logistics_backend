@@ -130,20 +130,12 @@ export class ShipmentRepository {
   }
 
   async update(id: string, shipmentData: Prisma.ShipmentUpdateInput, parcelData?: Prisma.ParcelUpdateInput) {
-    return prisma.$transaction(async (tx) => {
-      const shipment = await tx.shipment.update({
-        where: { id },
-        data: shipmentData
-      });
-
-      if (parcelData) {
-        await tx.parcel.updateMany({
-          where: { shipmentId: id },
-          data: parcelData
-        });
+    return prisma.shipment.update({
+      where: { id },
+      data: {
+        ...shipmentData,
+        ...(parcelData && { parcel: { update: parcelData } })
       }
-
-      return shipment;
     });
   }
 

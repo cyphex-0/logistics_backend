@@ -8,7 +8,7 @@ export const redis = new Redis(env.REDIS_URL, {
 });
 
 redis.on('error', (err) => {
-  logger.error('Redis connection error', { err });
+  logger.warn('Redis connection error', { err });
 });
 
 export async function getOrSetCache<T>(key: string, ttlSeconds: number, fetchFn: () => Promise<T>): Promise<T> {

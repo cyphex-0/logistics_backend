@@ -6,6 +6,7 @@ import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../sha
 import { ROLES } from '../../shared/constants/roles.js';
 import { redis } from '../../shared/utils/cache.js';
 import jwt from 'jsonwebtoken';
+import { logger } from '../../shared/utils/logger.js';
 
 export class AuthService {
   async register(data: any) {
@@ -107,7 +108,11 @@ export class AuthService {
       if (decoded && decoded.exp) {
         const ttl = decoded.exp - Math.floor(Date.now() / 1000);
         if (ttl > 0) {
+        try {
           await redis.set(`bl_${accessToken}`, '1', 'EX', ttl);
+        } catch (err) {
+          logger.warn('Redis SET failed during logout, token will not be blacklisted in cache', { err });
+        }
         }
       }
     } catch (e) {

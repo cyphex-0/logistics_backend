@@ -1,31 +1,26 @@
 import axios from 'axios';
 import { env } from '../../../config/env.js';
 import { PaymentGateway } from './index.js';
-import { redis } from '../../../shared/utils/cache.js';
+import { getOrSetCache } from '../../../shared/utils/cache.js';
 
 export class BkashGateway implements PaymentGateway {
   private async getToken(): Promise<string> {
-    const cachedToken = await redis.get('bkash_token');
-    if (cachedToken) return cachedToken;
-
-    const response = await axios.post(
-      `${env.BKASH_BASE_URL}/tokenized/checkout/token/grant`,
-      {
-        app_key: env.BKASH_APP_KEY,
-        app_secret: env.BKASH_APP_SECRET,
-      },
-      {
-        headers: {
-          username: env.BKASH_USERNAME,
-          password: env.BKASH_PASSWORD,
+    return getOrSetCache('bkash_token', 55 * 60, async () => {
+      const response = await axios.post(
+        `${env.BKASH_BASE_URL}/tokenized/checkout/token/grant`,
+        {
+          app_key: env.BKASH_APP_KEY,
+          app_secret: env.BKASH_APP_SECRET,
         },
-      }
-    );
-
-    const token = response.data.id_token;
-    // Cache for 55 minutes (bKash tokens usually last 1 hour)
-    await redis.set('bkash_token', token, 'EX', 55 * 60);
-    return token;
+        {
+          headers: {
+            username: env.BKASH_USERNAME,
+            password: env.BKASH_PASSWORD,
+          },
+        }
+      );
+      return response.data.id_token;
+    });
   }
 
   private async request(method: 'GET' | 'POST', endpoint: string, data?: any) {
@@ -74,7 +69,7 @@ export class BkashGateway implements PaymentGateway {
   async verifyPayment(paymentID: string) {
     // bKash Execute+Query pattern
     // First, try to execute the payment
-    let executeResponse = await this.request('POST', '/tokenized/checkout/execute', { paymentID });
+    await this.request('POST', '/tokenized/checkout/execute', { paymentID });
     
     // If execute says "Payment already completed" (status 2062) or it succeeds (status 0000)
     // we query to be absolutely sure.
