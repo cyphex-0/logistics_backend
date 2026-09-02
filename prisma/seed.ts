@@ -49,7 +49,7 @@ async function main() {
         email: user.email,
         name: user.name,
         password: passwordHash,
-        role: user.role as any,
+        role: user.role as unknown,
         serviceArea: user.serviceArea
       }
     });
@@ -83,10 +83,10 @@ async function main() {
   ];
 
   // For rules, we don't have a simple unique constraint besides ID, but we can delete all and recreate or findFirst
-  await prisma.pricingRule.deleteMany(); // Reset pricing rules cleanly
+  await prisma.pricingRule.deleteMunknown(); // Reset pricing rules cleanly
   for (const rule of rules) {
     await prisma.pricingRule.create({
-      data: rule as any
+      data: rule as unknown
     });
   }
 

@@ -10,4 +10,4 @@ export default defineConfig({
   migrations: {
     seed: 'npx tsx prisma/seed.ts'
   }
-} as any);
+} as unknown);
