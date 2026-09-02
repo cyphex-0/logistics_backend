@@ -49,7 +49,7 @@ export class PaymentService {
 
     // Idempotency check
     if (payment.status !== PaymentStatus.INITIATED) {
-      console.log(`Webhook idempotent skip: Payment ${payment.id} already processed`);
+      logger.info(`Webhook idempotent skip: Payment ${payment.id} already processed`);
       return;
     }
 
