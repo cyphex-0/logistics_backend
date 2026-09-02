@@ -3,7 +3,8 @@ import { env } from '../../../config/env.js';
 import { PaymentGateway } from './index.js';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia' as unknown
+  // @ts-expect-error: Stripe type definitions restrict apiVersion to a newer version literal, but this version is required for current API compatibility
+  apiVersion: '2025-01-27.acacia'
 });
 
 export class StripeGateway implements PaymentGateway {

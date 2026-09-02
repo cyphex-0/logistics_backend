@@ -1,3 +1,4 @@
+import Stripe from 'stripe';
 import { Request, Response } from 'express';
 import { stripeGateway } from './gateways/stripe.gateway.js';
 import { paymentService } from './payment.service.js';
@@ -14,7 +15,7 @@ export const stripeWebhookHandler = async (req: Request, res: Response) => {
     const event = stripeGateway.constructEvent(req.body, sig);
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as unknown;
+      const session = event.data.object as Stripe.Checkout.Session;
       await paymentService.handleGatewayConfirmation(session.id, PaymentMethod.STRIPE);
     }
 
