@@ -139,3 +139,7 @@ scratch/
 # Ignore Prisma generated client if using a custom output, otherwise node_modules covers it.
 # src/generated/
 
+
+# Project Plans
+B7A6/
+Plan/
