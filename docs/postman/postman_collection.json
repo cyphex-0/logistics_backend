@@ -41,8 +41,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -73,8 +78,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -105,8 +115,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -137,12 +152,43 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"courier@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Google Auth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "google"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"google_id_token_here\"\n}"
             }
           }
         },
@@ -158,8 +204,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/refresh-token",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh-token"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -179,8 +230,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
             }
           }
         }
@@ -201,8 +257,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             }
           }
         },
@@ -222,8 +283,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -243,8 +309,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me/notifications",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me", "notifications"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "notifications"
+              ]
             }
           }
         },
@@ -260,8 +332,16 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me/notifications/:id/read",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me", "notifications", ":id", "read"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "notifications",
+                ":id",
+                "read"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -288,8 +368,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/zones",
-              "host": ["{{baseUrl}}"],
-              "path": ["zones"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zones"
+              ]
             }
           }
         },
@@ -309,8 +393,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/zones",
-              "host": ["{{baseUrl}}"],
-              "path": ["zones"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zones"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -334,8 +422,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/zones/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["zones", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zones",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -361,8 +454,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/zones/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["zones", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zones",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -393,8 +491,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/pricing/calculate",
-              "host": ["{{baseUrl}}"],
-              "path": ["pricing", "calculate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pricing",
+                "calculate"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -414,8 +517,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/pricing/rules",
-              "host": ["{{baseUrl}}"],
-              "path": ["pricing", "rules"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pricing",
+                "rules"
+              ]
             }
           }
         },
@@ -435,8 +543,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/pricing/rules",
-              "host": ["{{baseUrl}}"],
-              "path": ["pricing", "rules"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pricing",
+                "rules"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -465,8 +578,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -486,8 +603,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments?page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -513,8 +634,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/search?status=PENDING&page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", "search"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                "search"
+              ],
               "query": [
                 {
                   "key": "status",
@@ -544,8 +670,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -571,8 +702,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id/assign",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id", "assign"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id",
+                "assign"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -602,8 +739,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id", "status"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id",
+                "status"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -629,8 +772,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id/cancel",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id", "cancel"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id",
+                "cancel"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -656,8 +805,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -683,8 +837,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -706,8 +865,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/shipments/:id/tracking",
-              "host": ["{{baseUrl}}"],
-              "path": ["shipments", ":id", "tracking"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipments",
+                ":id",
+                "tracking"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -738,8 +903,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/payments/initiate",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "initiate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "initiate"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -763,8 +933,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/payments/refund",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "refund"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "refund"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -784,12 +959,46 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/payments/stripe/webhook",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "stripe", "webhook"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "stripe",
+                "webhook"
+              ]
             },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"metadata\": {\n        \"shipmentId\": \"UUID\",\n        \"paymentId\": \"UUID\"\n      }\n    }\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "bKash Callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payments/bkash/callback?paymentID=123&status=success",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "bkash",
+                "callback"
+              ],
+              "query": [
+                {
+                  "key": "paymentID",
+                  "value": "123"
+                },
+                {
+                  "key": "status",
+                  "value": "success"
+                }
+              ]
             }
           }
         }
@@ -810,8 +1019,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
             }
           }
         },
@@ -827,8 +1041,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -854,8 +1074,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users/:id/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", ":id", "role"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":id",
+                "role"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -881,8 +1108,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -904,8 +1137,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/dashboard-stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "dashboard-stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "dashboard-stats"
+              ]
             }
           }
         },
@@ -921,8 +1159,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/audit-logs",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "audit-logs"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ]
             }
           }
         }
@@ -937,8 +1180,12 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           }
         }
