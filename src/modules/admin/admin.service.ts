@@ -1,0 +1,118 @@
+import { userRepository } from '../user/user.repository.js';
+import { auditService } from '../audit/audit.service.js';
+import { prisma } from '../../shared/prisma/client.js';
+import { redis } from '../../shared/utils/cache.js';
+import { NotFoundError, BusinessRuleError } from '../../shared/errors/index.js';
+import { Role, ShipmentStatus } from '../../generated/prisma/index.js';
+import { AUDIT_ENTITIES, AUDIT_ACTIONS } from '../../shared/constants/audit-actions.js';
+
+export class AdminService {
+  async listUsers(query: any) {
+    return userRepository.findManyAdmin(query);
+  }
+
+  async getUser(id: string) {
+    const user = await userRepository.findPublicById(id);
+    if (!user) throw new NotFoundError('User not found');
+    return user;
+  }
+
+  async updateUserRole(id: string, role: Role, adminId: string) {
+    const user = await userRepository.findById(id);
+    if (!user) throw new NotFoundError('User not found');
+    
+    if (user.role === role) return user;
+
+    const updatedUser = await userRepository.updateRole(id, role);
+
+    await auditService.log({
+      action: AUDIT_ACTIONS.USER_ROLE_UPDATED,
+      entity: AUDIT_ENTITIES.USER,
+      entityId: id,
+      actorId: adminId,
+      oldValue: { role: user.role },
+      newValue: { role }
+    });
+
+    return updatedUser;
+  }
+
+  async softDeleteUser(id: string, adminId: string) {
+    if (id === adminId) {
+      throw new BusinessRuleError('Admin cannot delete themselves');
+    }
+
+    const user = await userRepository.findById(id);
+    if (!user) throw new NotFoundError('User not found');
+    if (!user.isActive) throw new BusinessRuleError('User is already deleted');
+
+    const activeShipments = await userRepository.countActiveShipmentsForUser(id);
+    if (activeShipments > 0) {
+      throw new BusinessRuleError('Cannot delete user with active shipments');
+    }
+
+    await userRepository.softDelete(id);
+
+    await auditService.log({
+      action: AUDIT_ACTIONS.USER_DEACTIVATED,
+      entity: AUDIT_ENTITIES.USER,
+      entityId: id,
+      actorId: adminId
+    });
+
+    return { message: 'User deleted successfully' };
+  }
+
+  async dashboardStats() {
+    const cacheKey = 'admin_dashboard_stats';
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    // Promise.all to fetch stats concurrently
+    const [
+      totalUsers,
+      totalCouriers,
+      totalShipments,
+      pendingShipments,
+      inTransitShipments,
+      deliveredShipments,
+      totalRevenueData
+    ] = await Promise.all([
+      prisma.user.count({ where: { role: Role.CUSTOMER } }),
+      prisma.user.count({ where: { role: Role.COURIER } }),
+      prisma.shipment.count(),
+      prisma.shipment.count({ where: { status: ShipmentStatus.PENDING } }),
+      prisma.shipment.count({ where: { status: ShipmentStatus.IN_TRANSIT } }),
+      prisma.shipment.count({ where: { status: ShipmentStatus.DELIVERED } }),
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PAID' }
+      })
+    ]);
+
+    const stats = {
+      totalCustomers: totalUsers,
+      totalCouriers,
+      totalShipments,
+      shipmentsByStatus: {
+        pending: pendingShipments,
+        inTransit: inTransitShipments,
+        delivered: deliveredShipments
+      },
+      totalRevenue: totalRevenueData._sum.amount || 0
+    };
+
+    // Cache for 5 minutes
+    await redis.set(cacheKey, JSON.stringify(stats), 'EX', 300);
+
+    return stats;
+  }
+
+  async listAuditLogs(query: any) {
+    return auditService.list(query);
+  }
+}
+
+export const adminService = new AdminService();
