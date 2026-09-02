@@ -10,13 +10,13 @@ export class BkashGateway implements PaymentGateway {
         `${env.BKASH_BASE_URL}/tokenized/checkout/token/grant`,
         {
           app_key: env.BKASH_APP_KEY,
-          app_secret: env.BKASH_APP_SECRET,
+          app_secret: env.BKASH_APP_SECRET
         },
         {
           headers: {
             username: env.BKASH_USERNAME,
-            password: env.BKASH_PASSWORD,
-          },
+            password: env.BKASH_PASSWORD
+          }
         }
       );
       return response.data.id_token;
@@ -26,20 +26,23 @@ export class BkashGateway implements PaymentGateway {
   private async request(method: 'GET' | 'POST', endpoint: string, data?: any) {
     const token = await this.getToken();
     const url = `${env.BKASH_BASE_URL}${endpoint}`;
-    
+
     try {
       const response = await axios({
         method,
         url,
         data,
         headers: {
-          'Authorization': token,
-          'X-APP-Key': env.BKASH_APP_KEY,
-        },
+          Authorization: token,
+          'X-APP-Key': env.BKASH_APP_KEY
+        }
       });
       return response.data;
     } catch (error: any) {
-      console.error(`bKash API Error [${method} ${endpoint}]:`, error.response?.data || error.message);
+      console.error(
+        `bKash API Error [${method} ${endpoint}]:`,
+        error.response?.data || error.message
+      );
       throw error;
     }
   }
@@ -53,7 +56,7 @@ export class BkashGateway implements PaymentGateway {
       amount: amount.toString(),
       currency: 'BDT',
       intent: 'sale',
-      merchantInvoiceNumber: metadata.shipmentId,
+      merchantInvoiceNumber: metadata.shipmentId
     });
 
     if (response.statusCode !== '0000') {
@@ -62,7 +65,7 @@ export class BkashGateway implements PaymentGateway {
 
     return {
       paymentUrl: response.bkashURL,
-      gatewayReference: response.paymentID,
+      gatewayReference: response.paymentID
     };
   }
 
@@ -70,22 +73,26 @@ export class BkashGateway implements PaymentGateway {
     // bKash Execute+Query pattern
     // First, try to execute the payment
     await this.request('POST', '/tokenized/checkout/execute', { paymentID });
-    
+
     // If execute says "Payment already completed" (status 2062) or it succeeds (status 0000)
     // we query to be absolutely sure.
-    const queryResponse = await this.request('POST', '/tokenized/checkout/payment/status', { paymentID });
+    const queryResponse = await this.request('POST', '/tokenized/checkout/payment/status', {
+      paymentID
+    });
 
     if (queryResponse.transactionStatus === 'Completed') {
       return { status: 'PAID' as const, transactionId: queryResponse.trxID };
     }
-    
+
     return { status: 'FAILED' as const };
   }
 
   async refundPayment(paymentID: string, amount: number) {
     // Requires a query first to get the trxID
-    const queryResponse = await this.request('POST', '/tokenized/checkout/payment/status', { paymentID });
-    
+    const queryResponse = await this.request('POST', '/tokenized/checkout/payment/status', {
+      paymentID
+    });
+
     if (queryResponse.transactionStatus !== 'Completed') {
       return { success: false };
     }
@@ -95,13 +102,13 @@ export class BkashGateway implements PaymentGateway {
       amount: amount.toString(),
       trxID: queryResponse.trxID,
       sku: 'refund',
-      reason: 'User cancelled shipment',
+      reason: 'User cancelled shipment'
     });
 
     if (response.statusCode === '0000') {
       return { success: true, refundId: response.refundTrxID };
     }
-    
+
     return { success: false };
   }
 }

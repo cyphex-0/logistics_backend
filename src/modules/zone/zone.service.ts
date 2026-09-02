@@ -13,7 +13,7 @@ export class ZoneService {
 
   async create(data: any, adminId: string) {
     const zone = await zoneRepository.create(data);
-    
+
     await auditService.log({
       entity: AUDIT_ENTITIES.ZONE,
       entityId: zone.id,

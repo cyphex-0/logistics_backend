@@ -17,7 +17,7 @@ const envSchema = z.object({
   BKASH_APP_SECRET: z.string().min(1),
   BKASH_USERNAME: z.string().min(1),
   BKASH_PASSWORD: z.string().min(1),
-  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_ID: z.string().min(1)
 });
 
 const _env = envSchema.safeParse(process.env);

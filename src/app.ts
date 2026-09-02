@@ -19,12 +19,18 @@ export const app = express();
 
 app.use(requestLogger);
 app.use(helmet());
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: false
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || '*',
+    credentials: false
+  })
+);
 
-app.post('/api/v1/payments/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
+app.post(
+  '/api/v1/payments/stripe/webhook',
+  express.raw({ type: 'application/json' }),
+  stripeWebhookHandler
+);
 
 app.use(express.json({ limit: '10mb' }));
 

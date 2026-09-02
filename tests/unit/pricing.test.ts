@@ -16,15 +16,48 @@ describe('Pricing Math', () => {
     pricingService = new PricingService();
     // Mock repositories for unit testing pricing math without hitting DB/Redis
     vi.spyOn(zoneRepository, 'findById').mockImplementation(async (id) => {
-      if (id === 'valid-zone') return { id: 'valid-zone', name: 'Valid', city: 'C1', isActive: true, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      if (id === 'valid-zone')
+        return {
+          id: 'valid-zone',
+          name: 'Valid',
+          city: 'C1',
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null
+        };
       return null;
     });
 
     vi.spyOn(pricingRepository, 'list').mockImplementation(async () => {
       return [
-        { id: '1', zoneId: 'valid-zone', serviceType: 'STANDARD', basePrice: 60, pricePerKg: 12, maxWeight: 50, isActive: true },
-        { id: '2', zoneId: 'valid-zone', serviceType: 'EXPRESS', basePrice: 120, pricePerKg: 25, maxWeight: 30, isActive: true },
-        { id: '3', zoneId: null, serviceType: 'STANDARD', basePrice: 50, pricePerKg: 10, maxWeight: 50, isActive: true },
+        {
+          id: '1',
+          zoneId: 'valid-zone',
+          serviceType: 'STANDARD',
+          basePrice: 60,
+          pricePerKg: 12,
+          maxWeight: 50,
+          isActive: true
+        },
+        {
+          id: '2',
+          zoneId: 'valid-zone',
+          serviceType: 'EXPRESS',
+          basePrice: 120,
+          pricePerKg: 25,
+          maxWeight: 30,
+          isActive: true
+        },
+        {
+          id: '3',
+          zoneId: null,
+          serviceType: 'STANDARD',
+          basePrice: 50,
+          pricePerKg: 10,
+          maxWeight: 50,
+          isActive: true
+        }
       ] as any;
     });
   });
@@ -52,12 +85,14 @@ describe('Pricing Math', () => {
   });
 
   it('rejects weights over maxWeight', async () => {
-    await expect(pricingService.calculate('valid-zone', 55, 'STANDARD'))
-      .rejects.toThrow(BusinessRuleError);
+    await expect(pricingService.calculate('valid-zone', 55, 'STANDARD')).rejects.toThrow(
+      BusinessRuleError
+    );
   });
 
   it('rejects if no rule exists for service type', async () => {
-    await expect(pricingService.calculate('unknown-zone', 5, 'EXPRESS'))
-      .rejects.toThrow(BusinessRuleError);
+    await expect(pricingService.calculate('unknown-zone', 5, 'EXPRESS')).rejects.toThrow(
+      BusinessRuleError
+    );
   });
 });

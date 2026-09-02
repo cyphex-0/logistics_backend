@@ -11,22 +11,26 @@ redis.on('error', (err) => {
   logger.warn('Redis connection error', { err });
 });
 
-export async function getOrSetCache<T>(key: string, ttlSeconds: number, fetchFn: () => Promise<T>): Promise<T> {
+export async function getOrSetCache<T>(
+  key: string,
+  ttlSeconds: number,
+  fetchFn: () => Promise<T>
+): Promise<T> {
   try {
     const cached = await redis.get(key);
     if (cached) return JSON.parse(cached);
   } catch (err) {
     logger.warn('Redis GET failed, falling through to source', { key, err });
   }
-  
+
   const data = await fetchFn();
-  
+
   try {
     await redis.set(key, JSON.stringify(data), 'EX', ttlSeconds);
   } catch (err) {
     logger.warn('Redis SET failed, continuing without cache', { key, err });
   }
-  
+
   return data;
 }
 

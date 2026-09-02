@@ -17,13 +17,13 @@ beforeAll(async () => {
   if (process.env.SKIP_SEED === 'true') {
     return;
   }
-  
+
   try {
     await redis.flushall();
   } catch (err) {
     console.log('Redis flush failed, ignoring');
   }
-  
+
   // Since we use @@map, we need the exact mapped names. It's safer to query the db for all tables in the current schema.
   await prisma.$executeRawUnsafe(`
     DO $$ DECLARE
@@ -41,4 +41,3 @@ beforeAll(async () => {
 afterAll(async () => {
   await prisma.$disconnect();
 });
-

@@ -12,4 +12,9 @@ pricingRouter.use(authenticate);
 
 pricingRouter.post('/calculate', validate(calculateSchema), pricingController.calculate);
 pricingRouter.get('/rules', authorize(ROLES.ADMIN), pricingController.list);
-pricingRouter.put('/rules', authorize(ROLES.ADMIN), validate(upsertRuleSchema), pricingController.upsert);
+pricingRouter.put(
+  '/rules',
+  authorize(ROLES.ADMIN),
+  validate(upsertRuleSchema),
+  pricingController.upsert
+);

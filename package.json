@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "test": "jest",
+    "test": "vitest run",
     "test:unit": "set SKIP_SEED=true && vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:concurrency": "vitest run tests/concurrency",

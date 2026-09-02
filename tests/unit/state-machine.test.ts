@@ -1,4 +1,7 @@
-import { isValidTransition, isTerminal } from '../../src/modules/shipment/shipment.state-machine.js';
+import {
+  isValidTransition,
+  isTerminal
+} from '../../src/modules/shipment/shipment.state-machine.js';
 import { ShipmentStatus } from '../../src/generated/prisma/index.js';
 
 describe('Shipment State Machine', () => {
@@ -12,7 +15,9 @@ describe('Shipment State Machine', () => {
     });
 
     it('allows transition from CONFIRMED to PICKUP_ASSIGNED', () => {
-      expect(isValidTransition(ShipmentStatus.CONFIRMED, ShipmentStatus.PICKUP_ASSIGNED)).toBe(true);
+      expect(isValidTransition(ShipmentStatus.CONFIRMED, ShipmentStatus.PICKUP_ASSIGNED)).toBe(
+        true
+      );
     });
 
     it('denies skip-ahead transitions', () => {
@@ -38,4 +43,3 @@ describe('Shipment State Machine', () => {
     });
   });
 });
-

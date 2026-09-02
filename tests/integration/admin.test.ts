@@ -18,19 +18,25 @@ describe('Admin Integration Tests', () => {
 
   it('updates user role and logs audit trail', async () => {
     await adminService.updateUserRole(mockCustomer, 'COURIER' as any, mockAdmin);
-    
+
     const user = await userRepository.findById(mockCustomer);
     expect(user?.role).toBe(Role.COURIER);
 
     // Verify audit log
-    const auditLogs = await auditRepository.list({ action: AUDIT_ACTIONS.USER_ROLE_UPDATED }, { page: 1, limit: 10 }, { sortBy: 'createdAt', sortOrder: 'desc' });
+    const auditLogs = await auditRepository.list(
+      { action: AUDIT_ACTIONS.USER_ROLE_UPDATED },
+      { page: 1, limit: 10 },
+      { sortBy: 'createdAt', sortOrder: 'desc' }
+    );
     expect(auditLogs.logs.length).toBeGreaterThan(0);
     expect(auditLogs.logs[0].entityId).toBe(mockCustomer);
     expect(auditLogs.logs[0].actorId).toBe(mockAdmin);
   });
 
   it('rejects self-delete', async () => {
-    await expect(adminService.softDeleteUser(mockAdmin, mockAdmin)).rejects.toThrow(BusinessRuleError);
+    await expect(adminService.softDeleteUser(mockAdmin, mockAdmin)).rejects.toThrow(
+      BusinessRuleError
+    );
   });
 
   it('rejects delete if active shipments exist', async () => {
@@ -46,17 +52,28 @@ describe('Admin Integration Tests', () => {
       destinationCity: 'Chittagong',
       recipientName: 'Test Recipient',
       recipientPhone: '+8801700000000',
-      customerNote: 'test',
+      customerNote: 'test'
     };
-    const parcelData = { weight: 1, length: 1, width: 1, height: 1, parcelType: 'BOX', description: 'test' };
+    const parcelData = {
+      weight: 1,
+      length: 1,
+      width: 1,
+      height: 1,
+      parcelType: 'BOX',
+      description: 'test'
+    };
     const { shipmentService } = await import('../../src/modules/shipment/shipment.service.js');
     await shipmentService.create(mockCustomer, {
       ...shipmentData,
       parcel: parcelData
     });
 
-    await expect(adminService.softDeleteUser(mockCustomer, mockAdmin)).rejects.toThrow(BusinessRuleError);
-    await expect(adminService.softDeleteUser(mockCustomer, mockAdmin)).rejects.toThrow(BusinessRuleError);
+    await expect(adminService.softDeleteUser(mockCustomer, mockAdmin)).rejects.toThrow(
+      BusinessRuleError
+    );
+    await expect(adminService.softDeleteUser(mockCustomer, mockAdmin)).rejects.toThrow(
+      BusinessRuleError
+    );
   });
 
   it('fetches dashboard stats', async () => {

@@ -45,7 +45,7 @@ export class ShipmentRepository {
 
   async list(filters: Prisma.ShipmentWhereInput, page: number, limit: number) {
     const skip = (page - 1) * limit;
-    
+
     const [total, data] = await Promise.all([
       prisma.shipment.count({ where: filters }),
       prisma.shipment.findMany({
@@ -67,14 +67,22 @@ export class ShipmentRepository {
   async updateStatus(
     id: string,
     newStatus: ShipmentStatus,
+    currentUpdatedAt: Date,
     trackingEventData: Omit<Prisma.TrackingEventUncheckedCreateInput, 'shipmentId'>,
-    deliveryAttemptData?: Omit<Prisma.DeliveryAttemptUncheckedCreateInput, 'shipmentId' | 'attemptNumber'>
+    deliveryAttemptData?: Omit<
+      Prisma.DeliveryAttemptUncheckedCreateInput,
+      'shipmentId' | 'attemptNumber'
+    >
   ) {
     return prisma.$transaction(async (tx) => {
-      const shipment = await tx.shipment.update({
-        where: { id },
+      const result = await tx.shipment.updateMany({
+        where: { id, updatedAt: currentUpdatedAt },
         data: { status: newStatus }
       });
+
+      if (result.count === 0) {
+        return null;
+      }
 
       await tx.trackingEvent.create({
         data: {
@@ -83,7 +91,9 @@ export class ShipmentRepository {
         }
       });
 
-      if (deliveryAttemptData && shipment.courierId) {
+      const shipment = await tx.shipment.findUnique({ where: { id } });
+
+      if (deliveryAttemptData && shipment?.courierId) {
         const attemptCount = await tx.deliveryAttempt.count({
           where: { shipmentId: id }
         });
@@ -129,7 +139,11 @@ export class ShipmentRepository {
     });
   }
 
-  async update(id: string, shipmentData: Prisma.ShipmentUpdateInput, parcelData?: Prisma.ParcelUpdateInput) {
+  async update(
+    id: string,
+    shipmentData: Prisma.ShipmentUpdateInput,
+    parcelData?: Prisma.ParcelUpdateInput
+  ) {
     return prisma.shipment.update({
       where: { id },
       data: {

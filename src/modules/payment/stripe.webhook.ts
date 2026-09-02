@@ -17,7 +17,7 @@ export const stripeWebhookHandler = async (req: Request, res: Response) => {
       const session = event.data.object as any;
       await paymentService.handleGatewayConfirmation(session.id, PaymentMethod.STRIPE);
     }
-    
+
     // Always acknowledge receiving the event
     res.status(200).send('OK');
   } catch (err: any) {

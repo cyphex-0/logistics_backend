@@ -1,4 +1,4 @@
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class ZoneRepository {
@@ -39,10 +39,7 @@ export class ZoneRepository {
   async isReferenced(id: string): Promise<boolean> {
     const count = await prisma.shipment.count({
       where: {
-        OR: [
-          { originZoneId: id },
-          { destinationZoneId: id }
-        ]
+        OR: [{ originZoneId: id }, { destinationZoneId: id }]
       }
     });
     return count > 0;

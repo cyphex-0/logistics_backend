@@ -3,7 +3,7 @@ import { logger } from '../shared/utils/logger.js';
 import { randomUUID } from 'crypto';
 
 export function requestLogger(req: Request, res: Response, next: NextFunction) {
-  req.id = req.headers['x-request-id'] as string || randomUUID();
+  req.id = (req.headers['x-request-id'] as string) || randomUUID();
   res.setHeader('X-Request-Id', req.id);
 
   const start = Date.now();

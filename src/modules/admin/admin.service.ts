@@ -20,7 +20,7 @@ export class AdminService {
   async updateUserRole(id: string, role: Role, adminId: string) {
     const user = await userRepository.findById(id);
     if (!user) throw new NotFoundError('User not found');
-    
+
     if (user.role === role) {
       const publicUser = await userRepository.findPublicById(id);
       return publicUser;
@@ -104,7 +104,11 @@ export class AdminService {
   }
 
   async listAuditLogs(query: any) {
-    return auditService.list(query);
+    return auditService.list(
+      query,
+      { page: 1, limit: 10 },
+      { sortBy: 'createdAt', sortOrder: 'desc' }
+    );
   }
 }
 

@@ -6,7 +6,7 @@ describe('Auth Integration Tests', () => {
   const mockUser = {
     email: 'newuser@test.com',
     password: 'password123',
-    name: 'New User',
+    name: 'New User'
   };
 
   it('registers a new user and returns tokens', async () => {
@@ -27,19 +27,27 @@ describe('Auth Integration Tests', () => {
   });
 
   it('rejects invalid password login', async () => {
-    await expect(authService.login({ email: mockUser.email, password: 'wrongpassword' })).rejects.toThrow(AuthenticationError);
+    await expect(
+      authService.login({ email: mockUser.email, password: 'wrongpassword' })
+    ).rejects.toThrow(AuthenticationError);
   });
 
   it('refreshes token', async () => {
-    const { refreshToken } = await authService.login({ email: mockUser.email, password: mockUser.password });
+    const { refreshToken } = await authService.login({
+      email: mockUser.email,
+      password: mockUser.password
+    });
     const result = await authService.refresh(refreshToken);
     expect(result).toHaveProperty('accessToken');
   });
 
   it('logs out successfully and invalidates refresh token in DB', async () => {
-    const { user, accessToken } = await authService.login({ email: mockUser.email, password: mockUser.password });
+    const { user, accessToken } = await authService.login({
+      email: mockUser.email,
+      password: mockUser.password
+    });
     await authService.logout(user.id, accessToken);
-    
+
     const dbUser = await userRepository.findByEmail(mockUser.email);
     expect(dbUser?.refreshToken).toBeNull();
   });
@@ -49,6 +57,8 @@ describe('Auth Integration Tests', () => {
     const dbUser = await userRepository.findByEmail(mockUser.email);
     await userRepository.softDelete(dbUser!.id);
 
-    await expect(authService.login({ email: mockUser.email, password: mockUser.password })).rejects.toThrow(AuthorizationError);
+    await expect(
+      authService.login({ email: mockUser.email, password: mockUser.password })
+    ).rejects.toThrow(AuthorizationError);
   });
 });

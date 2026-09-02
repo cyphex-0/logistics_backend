@@ -7,11 +7,11 @@ export default defineConfig({
     pool: 'forks',
     poolOptions: {
       forks: {
-        singleFork: true,
+        singleFork: true
       }
     },
     fileParallelism: false,
     setupFiles: ['./tests/env-setup.js', './tests/setup.ts'],
-    include: ['tests/**/*.test.ts'],
-  },
+    include: ['tests/**/*.test.ts']
+  }
 });

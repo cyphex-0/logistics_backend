@@ -9,7 +9,7 @@ export class GoogleOAuthService {
     try {
       const ticket = await this.client.verifyIdToken({
         idToken,
-        audience: env.GOOGLE_CLIENT_ID,
+        audience: env.GOOGLE_CLIENT_ID
       });
       const payload = ticket.getPayload();
       if (!payload) {

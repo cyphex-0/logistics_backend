@@ -6,7 +6,7 @@ export const listUsersSchema = z.object({
     role: z.nativeEnum(Role).optional(),
     isActive: z.enum(['true', 'false']).optional(),
     page: z.string().regex(/^\d+$/).optional(),
-    limit: z.string().regex(/^\d+$/).optional(),
+    limit: z.string().regex(/^\d+$/).optional()
   })
 });
 

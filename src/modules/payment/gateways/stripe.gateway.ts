@@ -3,7 +3,7 @@ import { env } from '../../../config/env.js';
 import { PaymentGateway } from './index.js';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia' as any,
+  apiVersion: '2025-01-27.acacia' as any
 });
 
 export class StripeGateway implements PaymentGateway {
@@ -15,12 +15,12 @@ export class StripeGateway implements PaymentGateway {
           price_data: {
             currency: currency.toLowerCase(),
             product_data: {
-              name: `Shipment ${metadata.shipmentId}`,
+              name: `Shipment ${metadata.shipmentId}`
             },
-            unit_amount: Math.round(amount * 100), // Stripe uses cents
+            unit_amount: Math.round(amount * 100) // Stripe uses cents
           },
-          quantity: 1,
-        },
+          quantity: 1
+        }
       ],
       mode: 'payment',
       success_url: `http://localhost:3000/payment/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -28,7 +28,7 @@ export class StripeGateway implements PaymentGateway {
       client_reference_id: metadata.shipmentId,
       metadata: {
         paymentId: metadata.paymentId,
-        shipmentId: metadata.shipmentId,
+        shipmentId: metadata.shipmentId
       }
     });
 
@@ -38,17 +38,17 @@ export class StripeGateway implements PaymentGateway {
 
     return {
       paymentUrl: session.url,
-      gatewayReference: session.id, // Checkout Session ID
+      gatewayReference: session.id // Checkout Session ID
     };
   }
 
   async verifyPayment(gatewayReference: string) {
     const session = await stripe.checkout.sessions.retrieve(gatewayReference);
-    
+
     if (session.payment_status === 'paid') {
       return { status: 'PAID' as const, transactionId: session.payment_intent as string };
     }
-    
+
     return { status: 'PENDING' as const };
   }
 
@@ -61,10 +61,13 @@ export class StripeGateway implements PaymentGateway {
 
       const refund = await stripe.refunds.create({
         payment_intent: session.payment_intent as string,
-        amount: Math.round(amount * 100),
+        amount: Math.round(amount * 100)
       });
 
-      return { success: refund.status === 'succeeded' || refund.status === 'pending', refundId: refund.id };
+      return {
+        success: refund.status === 'succeeded' || refund.status === 'pending',
+        refundId: refund.id
+      };
     } catch (error) {
       console.error('Stripe refund failed:', error);
       return { success: false };

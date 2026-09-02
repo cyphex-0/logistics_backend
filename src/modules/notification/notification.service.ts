@@ -1,7 +1,7 @@
 import { NotificationRepository } from './notification.repository.js';
 import { AuthorizationError, NotFoundError } from '../../shared/errors/index.js';
 import { buildMeta } from '../../shared/utils/pagination.js';
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 
 export class NotificationService {
   constructor(private notificationRepository: NotificationRepository) {}
@@ -20,14 +20,18 @@ export class NotificationService {
   }
 
   async listForUser(userId: string, filters: any, pagination: { page: number; limit: number }) {
-    const { notifications, total } = await this.notificationRepository.listForUser(userId, filters, pagination);
+    const { notifications, total } = await this.notificationRepository.listForUser(
+      userId,
+      filters,
+      pagination
+    );
     const meta = buildMeta(total, pagination.page, pagination.limit);
     return { notifications, meta };
   }
 
   async markRead(notificationId: string, requestingUserId: string) {
     const notification = await this.notificationRepository.findById(notificationId);
-    
+
     if (!notification) {
       throw new NotFoundError('Notification not found');
     }

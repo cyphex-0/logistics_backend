@@ -1,4 +1,4 @@
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { AuditRepository } from './audit.repository.js';
 import { buildMeta } from '../../shared/utils/pagination.js';
 
@@ -21,7 +21,11 @@ export class AuditService {
     return this.auditRepository.log(input, tx);
   }
 
-  async list(filters: any, pagination: { page: number; limit: number }, sort: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
+  async list(
+    filters: any,
+    pagination: { page: number; limit: number },
+    sort: { sortBy: string; sortOrder: 'asc' | 'desc' }
+  ) {
     const { logs, total } = await this.auditRepository.list(filters, pagination, sort);
     const meta = buildMeta(total, pagination.page, pagination.limit);
     return { logs, meta };

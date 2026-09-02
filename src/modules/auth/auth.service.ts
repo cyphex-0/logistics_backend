@@ -1,6 +1,10 @@
 import { userRepository } from '../user/user.repository.js';
 import { googleOAuthService } from './google-oauth.service.js';
-import { AuthenticationError, ConflictError, AuthorizationError } from '../../shared/errors/index.js';
+import {
+  AuthenticationError,
+  ConflictError,
+  AuthorizationError
+} from '../../shared/errors/index.js';
 import { hashPassword, comparePassword, hashToken, compareToken } from '../../shared/utils/hash.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt.js';
 import { ROLES } from '../../shared/constants/roles.js';
@@ -102,17 +106,19 @@ export class AuthService {
 
   async logout(userId: string, accessToken: string) {
     await userRepository.updateRefreshToken(userId, null);
-    
+
     try {
       const decoded = jwt.decode(accessToken) as any;
       if (decoded && decoded.exp) {
         const ttl = decoded.exp - Math.floor(Date.now() / 1000);
         if (ttl > 0) {
-        try {
-          await redis.set(`bl_${accessToken}`, '1', 'EX', ttl);
-        } catch (err) {
-          logger.warn('Redis SET failed during logout, token will not be blacklisted in cache', { err });
-        }
+          try {
+            await redis.set(`bl_${accessToken}`, '1', 'EX', ttl);
+          } catch (err) {
+            logger.warn('Redis SET failed during logout, token will not be blacklisted in cache', {
+              err
+            });
+          }
         }
       }
     } catch (e) {

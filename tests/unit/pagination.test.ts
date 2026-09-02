@@ -21,4 +21,3 @@ describe('Pagination Utilities', () => {
     expect(parsePagination({ page: '1', limit: '100' })).toEqual({ page: 1, limit: 50 });
   });
 });
-

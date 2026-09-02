@@ -26,14 +26,19 @@ export class PaymentService {
 
     const gateway = this.getGateway(method);
     const amount = Number(shipment.estimatedPrice);
-    
+
     // Call gateway to create payment session
     const { paymentUrl, gatewayReference } = await gateway.createPayment(amount, 'BDT', {
       shipmentId
     });
 
     // Save to DB
-    const payment = await paymentRepository.upsertInitiatedPayment(shipmentId, shipment.estimatedPrice, method as PaymentMethod, gatewayReference);
+    const payment = await paymentRepository.upsertInitiatedPayment(
+      shipmentId,
+      shipment.estimatedPrice,
+      method as PaymentMethod,
+      gatewayReference
+    );
 
     return { paymentUrl, paymentId: payment.id };
   }
@@ -76,7 +81,7 @@ export class PaymentService {
           data: {
             shipmentId: payment.shipmentId,
             status: ShipmentStatus.CONFIRMED,
-            description: 'Payment successful, shipment confirmed',
+            description: 'Payment successful, shipment confirmed'
           }
         });
 
@@ -96,7 +101,7 @@ export class PaymentService {
         type: NOTIFICATION_TYPES.PAYMENT_CONFIRMED,
         title: 'Payment Successful',
         message: `Payment for shipment ${payment.shipment.trackingNumber} is confirmed.`,
-        referenceId: payment.shipmentId
+        metadata: { referenceId: payment.shipmentId }
       });
     } else if (verification.status === 'FAILED') {
       await prisma.payment.update({
@@ -114,7 +119,8 @@ export class PaymentService {
 
     const gateway = this.getGateway(payment.method);
     const amount = Number(payment.amount);
-    const gatewayReference = payment.method === PaymentMethod.STRIPE ? payment.stripeSessionId : payment.bkashPaymentId;
+    const gatewayReference =
+      payment.method === PaymentMethod.STRIPE ? payment.stripeSessionId : payment.bkashPaymentId;
 
     // Gateway refund call
     const refundResult = await gateway.refundPayment(gatewayReference!, amount);
@@ -153,7 +159,7 @@ export class PaymentService {
       actorId: adminId,
       newValue: { refundId: refundResult.refundId, reason }
     });
-    
+
     return { success: true };
   }
 }

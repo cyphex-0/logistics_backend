@@ -32,7 +32,7 @@ export class UserController {
 
   async markNotificationRead(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await userService.markNotificationRead(req.params.id, req.user!.id);
+      const result = await userService.markNotificationRead(req.params.id as string, req.user!.id);
       return sendSuccess(res, 200, 'Notification marked as read', result);
     } catch (e) {
       next(e);

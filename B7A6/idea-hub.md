@@ -61,6 +61,7 @@ Delivered
 ```
 
 **Possible users**
+
 - Customer
 - Courier
 - Hub Manager
@@ -68,6 +69,7 @@ Delivered
 - Admin
 
 **Possible features**
+
 - Customer registration and authentication
 - Parcel/shipment creation
 - Pickup scheduling
@@ -84,6 +86,7 @@ Delivered
 - Multi-organization support
 
 **Backend challenges**
+
 - Courier/resource assignment
 - Shipment state management
 - Transaction-safe status updates
@@ -93,4 +96,3 @@ Delivered
 - Delivery tracking
 
 ---
-

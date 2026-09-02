@@ -32,7 +32,7 @@ export class ShipmentController {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.getById(req.params.id, req.user);
+      const result = await shipmentService.getById(req.params.id as string, req.user);
       return sendSuccess(res, 200, 'Shipment retrieved successfully', result);
     } catch (e) {
       next(e);
@@ -41,7 +41,7 @@ export class ShipmentController {
 
   async getTrackingTimeline(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.getTrackingTimeline(req.params.id, req.user);
+      const result = await shipmentService.getTrackingTimeline(req.params.id as string, req.user);
       return sendSuccess(res, 200, 'Tracking timeline retrieved successfully', result);
     } catch (e) {
       next(e);
@@ -50,7 +50,11 @@ export class ShipmentController {
 
   async updateStatus(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.updateStatus(req.params.id, req.user, req.body);
+      const result = await shipmentService.updateStatus(
+        req.params.id as string,
+        req.user,
+        req.body
+      );
       return sendSuccess(res, 200, 'Shipment status updated successfully', result);
     } catch (e) {
       next(e);
@@ -59,7 +63,11 @@ export class ShipmentController {
 
   async assignCourier(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.assignCourier(req.params.id, req.user!.id, req.body.courierId);
+      const result = await shipmentService.assignCourier(
+        req.params.id as string,
+        req.user!.id,
+        req.body.courierId
+      );
       return sendSuccess(res, 200, 'Courier assigned successfully', result);
     } catch (e) {
       next(e);
@@ -68,7 +76,11 @@ export class ShipmentController {
 
   async cancel(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.cancel(req.params.id, req.user, req.body.reason);
+      const result = await shipmentService.cancel(
+        req.params.id as string,
+        req.user,
+        req.body.reason
+      );
       return sendSuccess(res, 200, 'Shipment cancelled successfully', result);
     } catch (e) {
       next(e);
@@ -77,7 +89,11 @@ export class ShipmentController {
 
   async updateShipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.updateShipment(req.params.id, req.user, req.body);
+      const result = await shipmentService.updateShipment(
+        req.params.id as string,
+        req.user,
+        req.body
+      );
       return sendSuccess(res, 200, 'Shipment updated successfully', result);
     } catch (e) {
       next(e);
@@ -86,7 +102,7 @@ export class ShipmentController {
 
   async softDeleteShipment(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await shipmentService.softDeleteShipment(req.params.id, req.user);
+      const result = await shipmentService.softDeleteShipment(req.params.id as string, req.user);
       return sendSuccess(res, 200, 'Shipment deleted successfully', result);
     } catch (e) {
       next(e);

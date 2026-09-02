@@ -8,13 +8,17 @@ import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-acti
 import { NOTIFICATION_TYPES } from '../../shared/constants/notification-types.js';
 import { isValidTransition } from './shipment.state-machine.js';
 import { deliveryAttemptRepository } from './delivery-attempt.repository.js';
-import { NotFoundError, AuthorizationError, BusinessRuleError, ConflictError } from '../../shared/errors/index.js';
+import {
+  NotFoundError,
+  AuthorizationError,
+  BusinessRuleError,
+  ConflictError
+} from '../../shared/errors/index.js';
 import { ROLES } from '../../shared/constants/roles.js';
 import { ShipmentStatus, DeliveryAttemptStatus } from '../../generated/prisma/index.js';
 import crypto from 'crypto';
 
 export class ShipmentService {
-  
   private generateTrackingNumber(): string {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const random = crypto.randomBytes(3).toString('hex').toUpperCase().substring(0, 5);
@@ -32,7 +36,11 @@ export class ShipmentService {
       throw new BusinessRuleError('One or both delivery zones are invalid or inactive');
     }
 
-    const { price } = await pricingService.calculate(data.destinationZoneId, data.parcel.weight, data.serviceType);
+    const { price } = await pricingService.calculate(
+      data.destinationZoneId,
+      data.parcel.weight,
+      data.serviceType
+    );
 
     let attempt = 0;
     while (attempt < 5) {
@@ -69,7 +77,11 @@ export class ShipmentService {
           actorId: customerId
         };
 
-        const shipment = await shipmentRepository.create(shipmentData, parcelData, trackingEventData);
+        const shipment = await shipmentRepository.create(
+          shipmentData,
+          parcelData,
+          trackingEventData
+        );
         return shipment;
       } catch (err: any) {
         if (err.code === 'P2002') {
@@ -130,10 +142,15 @@ export class ShipmentService {
     const shipment = await this.getById(id, user);
 
     if (!isValidTransition(shipment.status as ShipmentStatus, data.status)) {
-      throw new BusinessRuleError(`Invalid state transition from ${shipment.status} to ${data.status}`);
+      throw new BusinessRuleError(
+        `Invalid state transition from ${shipment.status} to ${data.status}`
+      );
     }
 
-    if (data.status === ShipmentStatus.FAILED_DELIVERY || data.status === ShipmentStatus.DELIVERED) {
+    if (
+      data.status === ShipmentStatus.FAILED_DELIVERY ||
+      data.status === ShipmentStatus.DELIVERED
+    ) {
       const attemptCount = await deliveryAttemptRepository.countByShipmentId(id);
       if (attemptCount >= 3) {
         throw new BusinessRuleError('Maximum delivery attempts (3) reached');
@@ -148,15 +165,28 @@ export class ShipmentService {
     };
 
     let deliveryAttemptData = undefined;
-    if (data.status === ShipmentStatus.FAILED_DELIVERY || data.status === ShipmentStatus.DELIVERED) {
+    if (
+      data.status === ShipmentStatus.FAILED_DELIVERY ||
+      data.status === ShipmentStatus.DELIVERED
+    ) {
       deliveryAttemptData = {
-        status: data.status === ShipmentStatus.DELIVERED ? DeliveryAttemptStatus.SUCCESSFUL : DeliveryAttemptStatus.FAILED,
+        status:
+          data.status === ShipmentStatus.DELIVERED
+            ? DeliveryAttemptStatus.SUCCESS
+            : DeliveryAttemptStatus.FAILED,
         failureReason: data.failureReason,
-        notes: data.description
+        notes: data.description,
+        courierId: shipment.courierId!
       };
     }
 
-    const updatedShipment = await shipmentRepository.updateStatus(id, data.status, trackingEventData, deliveryAttemptData);
+    const updatedShipment = await shipmentRepository.updateStatus(
+      id,
+      data.status,
+      shipment.updatedAt,
+      trackingEventData,
+      deliveryAttemptData
+    );
 
     await auditService.log({
       entity: AUDIT_ENTITIES.SHIPMENT,
@@ -172,7 +202,7 @@ export class ShipmentService {
       type: NOTIFICATION_TYPES.SHIPMENT_UPDATE,
       title: 'Shipment Status Updated',
       message: `Your shipment ${shipment.trackingNumber} is now ${data.status}`,
-      referenceId: id
+      metadata: { referenceId: id }
     });
 
     return updatedShipment;
@@ -182,7 +212,10 @@ export class ShipmentService {
     const shipment = await shipmentRepository.findById(id);
     if (!shipment) throw new NotFoundError('Shipment not found');
 
-    if (shipment.status !== ShipmentStatus.CONFIRMED && shipment.status !== ShipmentStatus.PICKUP_ASSIGNED) {
+    if (
+      shipment.status !== ShipmentStatus.CONFIRMED &&
+      shipment.status !== ShipmentStatus.PICKUP_ASSIGNED
+    ) {
       throw new BusinessRuleError('Shipment must be CONFIRMED or PICKUP_ASSIGNED to be assigned');
     }
 
@@ -207,11 +240,20 @@ export class ShipmentService {
       actorId: adminId
     };
 
-    const action = shipment.courierId ? AUDIT_ACTIONS.COURIER_REASSIGNED : AUDIT_ACTIONS.COURIER_ASSIGNED;
+    const action = shipment.courierId
+      ? AUDIT_ACTIONS.COURIER_REASSIGNED
+      : AUDIT_ACTIONS.COURIER_ASSIGNED;
 
-    const updatedShipment = await shipmentRepository.assignCourier(id, courierId, shipment.updatedAt, trackingEventData);
+    const updatedShipment = await shipmentRepository.assignCourier(
+      id,
+      courierId,
+      shipment.updatedAt,
+      trackingEventData
+    );
     if (!updatedShipment) {
-      throw new ConflictError('Concurrent modification detected during assignment. Please try again.');
+      throw new ConflictError(
+        'Concurrent modification detected during assignment. Please try again.'
+      );
     }
 
     await auditService.log({
@@ -228,7 +270,7 @@ export class ShipmentService {
       type: NOTIFICATION_TYPES.NEW_ASSIGNMENT,
       title: 'New Pickup Assigned',
       message: `You have been assigned to pick up shipment ${shipment.trackingNumber}`,
-      referenceId: id
+      metadata: { referenceId: id }
     });
 
     return updatedShipment;
@@ -238,7 +280,9 @@ export class ShipmentService {
     const shipment = await this.getById(id, user);
 
     if (shipment.status !== ShipmentStatus.PENDING) {
-      throw new BusinessRuleError('Only PENDING shipments can be cancelled directly by the user (Pre-payment cancel). Paid cancellations are processed via support.');
+      throw new BusinessRuleError(
+        'Only PENDING shipments can be cancelled directly by the user (Pre-payment cancel). Paid cancellations are processed via support.'
+      );
     }
 
     const trackingEventData = {
@@ -247,7 +291,12 @@ export class ShipmentService {
       actorId: user.id
     };
 
-    const updatedShipment = await shipmentRepository.updateStatus(id, ShipmentStatus.CANCELLED, trackingEventData);
+    const updatedShipment = await shipmentRepository.updateStatus(
+      id,
+      ShipmentStatus.CANCELLED,
+      shipment.updatedAt,
+      trackingEventData
+    );
 
     await auditService.log({
       entity: AUDIT_ENTITIES.SHIPMENT,
@@ -267,7 +316,7 @@ export class ShipmentService {
     }
 
     let estimatedPrice = shipment.estimatedPrice;
-    
+
     // Check if price needs recalculation
     const destZone = data.destinationZoneId || shipment.destinationZoneId;
     const weight = data.parcel?.weight || shipment.parcel?.weight;
@@ -275,7 +324,9 @@ export class ShipmentService {
 
     if (data.destinationZoneId || (data.parcel && data.parcel.weight) || data.serviceType) {
       const result = await pricingService.calculate(destZone, weight, serviceType);
-      estimatedPrice = new (await import('../../../generated/prisma/index.js')).Prisma.Decimal(result.price);
+      estimatedPrice = new (await import('../../generated/prisma/index.js')).Prisma.Decimal(
+        result.price
+      );
     }
 
     const shipmentData: any = {};
@@ -289,9 +340,9 @@ export class ShipmentService {
     if (data.recipientPhone) shipmentData.recipientPhone = data.recipientPhone;
     if (data.serviceType) shipmentData.serviceType = data.serviceType;
     if (data.notes) shipmentData.notes = data.notes;
-    
+
     if (Object.keys(shipmentData).length > 0) {
-        shipmentData.estimatedPrice = estimatedPrice;
+      shipmentData.estimatedPrice = estimatedPrice;
     }
 
     const updatedShipment = await shipmentRepository.update(id, shipmentData, data.parcel);
@@ -302,12 +353,15 @@ export class ShipmentService {
     const shipment = await shipmentRepository.findById(id);
     if (!shipment) throw new NotFoundError('Shipment not found');
 
-    if (shipment.status !== ShipmentStatus.PENDING && shipment.status !== ShipmentStatus.CANCELLED) {
+    if (
+      shipment.status !== ShipmentStatus.PENDING &&
+      shipment.status !== ShipmentStatus.CANCELLED
+    ) {
       throw new BusinessRuleError('Only PENDING or CANCELLED shipments can be deleted');
     }
 
     const result = await shipmentRepository.softDelete(id);
-    
+
     // audit log
     await auditService.log({
       entity: AUDIT_ENTITIES.SHIPMENT,

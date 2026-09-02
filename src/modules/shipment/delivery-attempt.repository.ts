@@ -1,4 +1,4 @@
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class DeliveryAttemptRepository {

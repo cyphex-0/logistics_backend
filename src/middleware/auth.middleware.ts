@@ -12,7 +12,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     let isBlacklisted = null;
     try {
       isBlacklisted = await redis.get(`bl_${token}`);

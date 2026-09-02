@@ -1,4 +1,4 @@
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class AuditRepository {
@@ -7,7 +7,11 @@ export class AuditRepository {
     return client.auditLog.create({ data });
   }
 
-  async list(filters: any, pagination: { page: number; limit: number }, sort: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
+  async list(
+    filters: any,
+    pagination: { page: number; limit: number },
+    sort: { sortBy: string; sortOrder: 'asc' | 'desc' }
+  ) {
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
 

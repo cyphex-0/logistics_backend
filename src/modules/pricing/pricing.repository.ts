@@ -1,14 +1,11 @@
-import { Prisma } from '../../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class PricingRepository {
   async list() {
     return prisma.pricingRule.findMany({
       include: { zone: true },
-      orderBy: [
-        { serviceType: 'asc' },
-        { zoneId: 'asc' }
-      ]
+      orderBy: [{ serviceType: 'asc' }, { zoneId: 'asc' }]
     });
   }
 
@@ -23,7 +20,11 @@ export class PricingRepository {
     return client.pricingRule.create({ data });
   }
 
-  async update(id: string, data: Prisma.PricingRuleUncheckedUpdateInput, tx?: Prisma.TransactionClient) {
+  async update(
+    id: string,
+    data: Prisma.PricingRuleUncheckedUpdateInput,
+    tx?: Prisma.TransactionClient
+  ) {
     const client = tx ?? prisma;
     return client.pricingRule.update({ where: { id }, data });
   }

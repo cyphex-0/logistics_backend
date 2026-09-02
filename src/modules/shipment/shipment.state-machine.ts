@@ -13,7 +13,10 @@ export const VALID_TRANSITIONS: Record<ShipmentStatus, ShipmentStatus[]> = {
   [ShipmentStatus.CANCELLED]: []
 };
 
-export function isValidTransition(currentStatus: ShipmentStatus, newStatus: ShipmentStatus): boolean {
+export function isValidTransition(
+  currentStatus: ShipmentStatus,
+  newStatus: ShipmentStatus
+): boolean {
   if (currentStatus === newStatus) return true; // idempotent
   const allowedNext = VALID_TRANSITIONS[currentStatus];
   return allowedNext.includes(newStatus);

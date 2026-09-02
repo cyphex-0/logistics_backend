@@ -5,18 +5,13 @@ import { logger } from '../shared/utils/logger.js';
 import { Prisma } from '../generated/prisma/index.js';
 import { ZodError } from 'zod';
 
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   if (err instanceof AppError) {
     return sendError(res, err.statusCode, err.message, (err as any).errors);
   }
 
   if (err instanceof ZodError) {
-    const errors = err.issues.map(issue => ({
+    const errors = err.issues.map((issue) => ({
       field: issue.path.join('.'),
       message: issue.message
     }));

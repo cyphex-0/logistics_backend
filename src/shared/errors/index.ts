@@ -10,7 +10,10 @@ export class AppError extends Error {
   }
 }
 
-interface ErrorItem { field: string; message: string; }
+interface ErrorItem {
+  field: string;
+  message: string;
+}
 
 export class ValidationError extends AppError {
   public readonly errors?: ErrorItem[];

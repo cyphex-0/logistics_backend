@@ -16,7 +16,5 @@ export const logger = winston.createLogger({
     winston.format.timestamp(),
     env.NODE_ENV === 'production' ? winston.format.json() : winston.format.prettyPrint()
   ),
-  transports: [
-    new winston.transports.Console()
-  ]
+  transports: [new winston.transports.Console()]
 });

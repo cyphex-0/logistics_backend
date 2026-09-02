@@ -12,7 +12,7 @@ export const PUBLIC_USER_SELECT = {
   isAvailable: true,
   isActive: true,
   createdAt: true,
-  updatedAt: true,
+  updatedAt: true
 } satisfies Prisma.UserSelect;
 
 export class UserRepository {
@@ -32,7 +32,7 @@ export class UserRepository {
   async findPublicById(id: string) {
     return prisma.user.findFirst({
       where: { id },
-      select: PUBLIC_USER_SELECT,
+      select: PUBLIC_USER_SELECT
     });
   }
 
@@ -41,7 +41,11 @@ export class UserRepository {
     return client.user.create({ data });
   }
 
-  async updateRefreshToken(id: string, refreshTokenHash: string | null, tx?: Prisma.TransactionClient) {
+  async updateRefreshToken(
+    id: string,
+    refreshTokenHash: string | null,
+    tx?: Prisma.TransactionClient
+  ) {
     const client = tx ?? prisma;
     return client.user.update({
       where: { id },

@@ -14,7 +14,7 @@ export class AdminController {
 
   async getUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await adminService.getUser(req.params.id);
+      const user = await adminService.getUser(req.params.id as string);
       return sendSuccess(res, 200, 'User retrieved successfully', user);
     } catch (e) {
       next(e);
@@ -23,7 +23,11 @@ export class AdminController {
 
   async updateUserRole(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await adminService.updateUserRole(req.params.id, req.body.role, req.user!.id);
+      const result = await adminService.updateUserRole(
+        req.params.id as string,
+        req.body.role,
+        req.user!.id
+      );
       return sendSuccess(res, 200, 'User role updated', result);
     } catch (e) {
       next(e);
@@ -32,7 +36,7 @@ export class AdminController {
 
   async softDeleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await adminService.softDeleteUser(req.params.id, req.user!.id);
+      const result = await adminService.softDeleteUser(req.params.id as string, req.user!.id);
       return sendSuccess(res, 200, result.message);
     } catch (e) {
       next(e);

@@ -11,7 +11,14 @@ describe('Security Tests', () => {
   it('rejects IDOR: customer viewing another customers shipment', async () => {
     // Create shipment for customer 1
     const shipment = await shipmentService.create(customer1.id, {
-      parcel: { weight: 1, length: 1, width: 1, height: 1, parcelType: 'DOCUMENT', description: 'Docs' },
+      parcel: {
+        weight: 1,
+        length: 1,
+        width: 1,
+        height: 1,
+        parcelType: 'DOCUMENT',
+        description: 'Docs'
+      },
       originAddress: 'Pickup 1',
       destinationAddress: 'Drop 2',
       originZoneId: SEED_IDS.zone1, // Fixed zone to use valid pricing rule
@@ -24,14 +31,15 @@ describe('Security Tests', () => {
     });
 
     // Customer 2 tries to fetch it
-    await expect(shipmentService.getById(shipment.id, customer2))
-      .rejects.toThrowError('You do not have permission to view this shipment');
+    await expect(shipmentService.getById(shipment.id, customer2)).rejects.toThrowError(
+      'You do not have permission to view this shipment'
+    );
   });
 
   it('rejects webhook signature spoofing', async () => {
     const { app } = await import('../../src/app.js');
     const request = (await import('supertest')).default;
-    
+
     const payload = Buffer.from('fake payload');
     const signature = 't=123,v1=fake_signature';
 
@@ -39,8 +47,46 @@ describe('Security Tests', () => {
       .post('/api/v1/payments/stripe/webhook')
       .set('stripe-signature', signature)
       .send(payload);
-    
+
     expect(res.status).toBe(400);
     expect(res.text).toContain('Webhook Error');
+  });
+
+  it('rejects role escalation attempts', async () => {
+    const { app } = await import('../../src/app.js');
+    const request = (await import('supertest')).default;
+    const { authService } = await import('../../src/modules/auth/auth.service.js');
+    const tokens = await authService.login({
+      email: 'customer1@test.com',
+      password: 'password123'
+    }); // customer1
+
+    // Try to update role through a profile update endpoint (if it existed) or admin endpoint
+    // Customer hitting an admin route to update a role
+    const res = await request(app)
+      .patch('/api/v1/admin/users/' + customer2.id + '/role')
+      .set('Authorization', `Bearer ${tokens.accessToken}`)
+      .send({ role: 'ADMIN' });
+
+    expect(res.status).toBe(403);
+  });
+
+  it('asserts no passwords or tokens leak in responses (data exposure sweep)', async () => {
+    const { app } = await import('../../src/app.js');
+    const request = (await import('supertest')).default;
+    const { authService } = await import('../../src/modules/auth/auth.service.js');
+    const tokens = await authService.login({ email: 'admin@test.com', password: 'password123' });
+
+    const res = await request(app)
+      .get('/api/v1/admin/users')
+      .set('Authorization', `Bearer ${tokens.accessToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.data.length).toBeGreaterThan(0);
+
+    const firstUser = res.body.data.data[0];
+    expect(firstUser).not.toHaveProperty('passwordHash');
+    expect(firstUser).not.toHaveProperty('password');
+    expect(firstUser).not.toHaveProperty('refreshToken');
   });
 });

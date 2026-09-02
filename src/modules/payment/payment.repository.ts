@@ -2,7 +2,12 @@ import { Prisma, PaymentStatus, PaymentMethod } from '../../generated/prisma/ind
 import { prisma } from '../../shared/prisma/client.js';
 
 export class PaymentRepository {
-  async upsertInitiatedPayment(shipmentId: string, amount: Prisma.Decimal, method: PaymentMethod, gatewayReference: string) {
+  async upsertInitiatedPayment(
+    shipmentId: string,
+    amount: Prisma.Decimal,
+    method: PaymentMethod,
+    gatewayReference: string
+  ) {
     const existing = await prisma.payment.findFirst({
       where: { shipmentId }
     });
@@ -12,7 +17,7 @@ export class PaymentRepository {
       method,
       amount,
       stripeSessionId: method === PaymentMethod.STRIPE ? gatewayReference : null,
-      bkashPaymentId: method === PaymentMethod.BKASH ? gatewayReference : null,
+      bkashPaymentId: method === PaymentMethod.BKASH ? gatewayReference : null
     };
 
     if (existing) {
