@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../src/generated/prisma/index.js';
+import { PrismaClient, Role, Prisma } from '../src/generated/prisma/index.js';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
@@ -49,14 +49,14 @@ async function main() {
         email: user.email,
         name: user.name,
         password: passwordHash,
-        role: user.role as unknown,
+        role: user.role as Role,
         serviceArea: user.serviceArea
       }
     });
   }
 
   // Seed Pricing Rules (STANDARD and EXPRESS for generic and specific zones)
-  const rules = [
+  const rules: Prisma.PricingRuleUncheckedCreateInput[] = [
     { serviceType: 'STANDARD', basePrice: 50, pricePerKg: 10, maxWeight: 50, zoneId: null },
     { serviceType: 'EXPRESS', basePrice: 100, pricePerKg: 20, maxWeight: 30, zoneId: null },
     {
@@ -64,29 +64,29 @@ async function main() {
       basePrice: 60,
       pricePerKg: 12,
       maxWeight: 50,
-      zoneId: dhakaZone?.id
+      zoneId: dhakaZone?.id || null
     },
     {
       serviceType: 'EXPRESS',
       basePrice: 120,
       pricePerKg: 25,
       maxWeight: 30,
-      zoneId: dhakaZone?.id
+      zoneId: dhakaZone?.id || null
     },
     {
       serviceType: 'STANDARD',
       basePrice: 80,
       pricePerKg: 15,
       maxWeight: 50,
-      zoneId: chittagongZone?.id
+      zoneId: chittagongZone?.id || null
     }
   ];
 
   // For rules, we don't have a simple unique constraint besides ID, but we can delete all and recreate or findFirst
-  await prisma.pricingRule.deleteMunknown(); // Reset pricing rules cleanly
+  await prisma.pricingRule.deleteMany(); // Reset pricing rules cleanly
   for (const rule of rules) {
     await prisma.pricingRule.create({
-      data: rule as unknown
+      data: rule
     });
   }
 
