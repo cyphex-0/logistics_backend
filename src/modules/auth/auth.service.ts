@@ -1,3 +1,4 @@
+import { Prisma } from '../../generated/prisma/index.js';
 import { userRepository } from '../user/user.repository.js';
 import { googleOAuthService } from './google-oauth.service.js';
 import {
@@ -13,13 +14,13 @@ import jwt from 'jsonwebtoken';
 import { logger } from '../../shared/utils/logger.js';
 
 export class AuthService {
-  async register(data: any) {
+  async register(data: Prisma.UserCreateInput) {
     const existing = await userRepository.findByEmail(data.email);
     if (existing) {
       throw new ConflictError('Email already exists');
     }
 
-    const hashedPassword = await hashPassword(data.password);
+    const hashedPassword = await hashPassword(data.password!);
     const user = await userRepository.create({
       ...data,
       password: hashedPassword
@@ -28,7 +29,7 @@ export class AuthService {
     return this.issueTokens(user);
   }
 
-  async login(data: any) {
+  async login(data: Prisma.UserCreateInput) {
     const user = await userRepository.findByEmail(data.email);
     if (!user || !user.password) {
       throw new AuthenticationError('Invalid credentials');
@@ -37,7 +38,7 @@ export class AuthService {
       throw new AuthorizationError('Account deactivated');
     }
 
-    const isValid = await comparePassword(data.password, user.password);
+    const isValid = await comparePassword(data.password!, user.password);
     if (!isValid) {
       throw new AuthenticationError('Invalid credentials');
     }
@@ -83,7 +84,7 @@ export class AuthService {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch (e) {
+    } catch {
       throw new AuthenticationError('Invalid or expired refresh token');
     }
 
@@ -108,7 +109,7 @@ export class AuthService {
     await userRepository.updateRefreshToken(userId, null);
 
     try {
-      const decoded = jwt.decode(accessToken) as any;
+      const decoded = jwt.decode(accessToken) as { exp?: number };
       if (decoded && decoded.exp) {
         const ttl = decoded.exp - Math.floor(Date.now() / 1000);
         if (ttl > 0) {
@@ -121,12 +122,12 @@ export class AuthService {
           }
         }
       }
-    } catch (e) {
+    } catch {
       // Ignore token decode errors during logout
     }
   }
 
-  private async issueTokens(user: any) {
+  private async issueTokens(user: Prisma.UserGetPayload<{}>) {
     const accessToken = signAccessToken({
       userId: user.id,
       email: user.email,
@@ -138,10 +139,8 @@ export class AuthService {
 
     await userRepository.updateRefreshToken(user.id, refreshTokenHash);
 
-    const publicUser = { ...user };
-    delete publicUser.password;
-    delete publicUser.refreshToken;
-    delete publicUser.googleId;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, refreshToken, googleId, ...publicUser } = user;
 
     return {
       user: publicUser,

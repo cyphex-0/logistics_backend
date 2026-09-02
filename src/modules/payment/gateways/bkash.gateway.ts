@@ -23,7 +23,7 @@ export class BkashGateway implements PaymentGateway {
     });
   }
 
-  private async request(method: 'GET' | 'POST', endpoint: string, data?: any) {
+  private async request(method: 'GET' | 'POST', endpoint: string, data?: Record<string, unknown>) {
     const token = await this.getToken();
     const url = `${env.BKASH_BASE_URL}${endpoint}`;
 
@@ -38,16 +38,16 @@ export class BkashGateway implements PaymentGateway {
         }
       });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(
         `bKash API Error [${method} ${endpoint}]:`,
-        error.response?.data || error.message
+        (error as Error).message
       );
       throw error;
     }
   }
 
-  async createPayment(amount: number, currency: string, metadata: any) {
+  async createPayment(amount: number, currency: string, metadata: Record<string, string>) {
     // Mode 0011 is for checkout
     const response = await this.request('POST', '/tokenized/checkout/create', {
       mode: '0011',

@@ -16,7 +16,7 @@ export class GoogleOAuthService {
         throw new AuthenticationError('Invalid Google token payload');
       }
       return payload;
-    } catch (err) {
+    } catch {
       throw new AuthenticationError('Invalid Google token');
     }
   }

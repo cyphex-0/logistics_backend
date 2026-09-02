@@ -8,7 +8,7 @@ export class AuditRepository {
   }
 
   async list(
-    filters: any,
+    filters: Prisma.AuditLogWhereInput,
     pagination: { page: number; limit: number },
     sort: { sortBy: string; sortOrder: 'asc' | 'desc' }
   ) {

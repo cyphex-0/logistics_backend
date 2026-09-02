@@ -1,3 +1,7 @@
+import { z } from 'zod';
+
+import { createShipmentSchema, updateShipmentSchema, updateStatusSchema } from './shipment.validation.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import { shipmentRepository } from './shipment.repository.js';
 import { pricingService } from '../pricing/pricing.service.js';
 import { zoneService } from '../zone/zone.service.js';
@@ -25,10 +29,10 @@ export class ShipmentService {
     return `CLG-${date}-${random}`;
   }
 
-  async create(customerId: string, data: any) {
+  async create(customerId: string, data: z.infer<typeof createShipmentSchema>['body']) {
     const zones = await zoneService.list();
-    const originZone = zones.find((z: any) => z.id === data.originZoneId && z.isActive);
-    const destZone = zones.find((z: any) => z.id === data.destinationZoneId && z.isActive);
+    const originZone = zones.find((z: Prisma.DeliveryZoneGetPayload<{}>) => z.id === data.originZoneId && z.isActive);
+    const destZone = zones.find((z: Prisma.DeliveryZoneGetPayload<{}>) => z.id === data.destinationZoneId && z.isActive);
 
     if (!originZone || !destZone) {
       console.error('ZONES FETCHED:', zones);
@@ -38,7 +42,7 @@ export class ShipmentService {
 
     const { price } = await pricingService.calculate(
       data.destinationZoneId,
-      data.parcel.weight,
+      (data.parcel?.weight || 0),
       data.serviceType
     );
 
@@ -83,8 +87,8 @@ export class ShipmentService {
           trackingEventData
         );
         return shipment;
-      } catch (err: any) {
-        if (err.code === 'P2002') {
+      } catch (err: unknown) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
           attempt++;
           continue;
         }
@@ -94,7 +98,7 @@ export class ShipmentService {
     throw new ConflictError('Failed to generate unique tracking number after 5 attempts');
   }
 
-  async getById(id: string, user: any) {
+  async getById(id: string, user: { id: string; email: string; role: string }) {
     const shipment = await shipmentRepository.findById(id);
     if (!shipment) {
       throw new NotFoundError('Shipment not found');
@@ -110,11 +114,11 @@ export class ShipmentService {
     return shipment;
   }
 
-  async list(user: any, query: any) {
-    const page = parseInt(query.page) || 1;
-    const limit = Math.min(parseInt(query.limit) || 10, 50);
+  async list(user: { id: string; email: string; role: string }, query: Record<string, unknown>) {
+    const page = parseInt(query.page as string) || 1;
+    const limit = Math.min(parseInt(query.limit as string) || 10, 50);
 
-    const filters: any = {};
+    const filters: Prisma.ShipmentWhereInput = {};
     if (user.role === ROLES.CUSTOMER) {
       filters.customerId = user.id;
     } else if (user.role === ROLES.COURIER) {
@@ -122,10 +126,10 @@ export class ShipmentService {
     }
 
     if (query.status) {
-      filters.status = query.status;
+      filters.status = query.status as ShipmentStatus;
     }
     if (query.trackingNumber) {
-      filters.trackingNumber = { contains: query.trackingNumber, mode: 'insensitive' };
+      filters.trackingNumber = { contains: query.trackingNumber as string, mode: 'insensitive' };
     }
 
     filters.deletedAt = null;
@@ -133,12 +137,12 @@ export class ShipmentService {
     return shipmentRepository.list(filters, page, limit);
   }
 
-  async getTrackingTimeline(id: string, user: any) {
+  async getTrackingTimeline(id: string, user: { id: string; email: string; role: string }) {
     await this.getById(id, user);
     return trackingService.getTimeline(id, user.role);
   }
 
-  async updateStatus(id: string, user: any, data: any) {
+  async updateStatus(id: string, user: { id: string; email: string; role: string }, data: z.infer<typeof updateStatusSchema>['body']) {
     const shipment = await this.getById(id, user);
 
     if (!isValidTransition(shipment.status as ShipmentStatus, data.status)) {
@@ -276,7 +280,7 @@ export class ShipmentService {
     return updatedShipment;
   }
 
-  async cancel(id: string, user: any, reason: string) {
+  async cancel(id: string, user: { id: string; email: string; role: string }, reason: string) {
     const shipment = await this.getById(id, user);
 
     if (shipment.status !== ShipmentStatus.PENDING) {
@@ -309,7 +313,7 @@ export class ShipmentService {
     return updatedShipment;
   }
 
-  async updateShipment(id: string, user: any, data: any) {
+  async updateShipment(id: string, user: { id: string; email: string; role: string }, data: z.infer<typeof updateShipmentSchema>['body']) {
     const shipment = await this.getById(id, user);
     if (shipment.status !== ShipmentStatus.PENDING) {
       throw new BusinessRuleError('Only PENDING shipments can be updated');
@@ -319,7 +323,7 @@ export class ShipmentService {
 
     // Check if price needs recalculation
     const destZone = data.destinationZoneId || shipment.destinationZoneId;
-    const weight = data.parcel?.weight || shipment.parcel?.weight;
+    const weight = Number(data.parcel?.weight || shipment.parcel?.weight || 0);
     const serviceType = data.serviceType || shipment.serviceType;
 
     if (data.destinationZoneId || (data.parcel && data.parcel.weight) || data.serviceType) {
@@ -329,13 +333,13 @@ export class ShipmentService {
       );
     }
 
-    const shipmentData: any = {};
+    const shipmentData: Prisma.ShipmentUpdateInput = {};
     if (data.originAddress) shipmentData.originAddress = data.originAddress;
     if (data.originCity) shipmentData.originCity = data.originCity;
-    if (data.originZoneId) shipmentData.originZoneId = data.originZoneId;
+    if (data.originZoneId) shipmentData.originZone = { connect: { id: data.originZoneId } };
     if (data.destinationAddress) shipmentData.destinationAddress = data.destinationAddress;
     if (data.destinationCity) shipmentData.destinationCity = data.destinationCity;
-    if (data.destinationZoneId) shipmentData.destinationZoneId = data.destinationZoneId;
+    if (data.destinationZoneId) shipmentData.destinationZone = { connect: { id: data.destinationZoneId } };
     if (data.recipientName) shipmentData.recipientName = data.recipientName;
     if (data.recipientPhone) shipmentData.recipientPhone = data.recipientPhone;
     if (data.serviceType) shipmentData.serviceType = data.serviceType;
@@ -349,7 +353,7 @@ export class ShipmentService {
     return updatedShipment;
   }
 
-  async softDeleteShipment(id: string, user: any) {
+  async softDeleteShipment(id: string, user: { id: string; email: string; role: string }) {
     const shipment = await shipmentRepository.findById(id);
     if (!shipment) throw new NotFoundError('Shipment not found');
 

@@ -1,3 +1,4 @@
+import { Prisma } from '../../generated/prisma/index.js';
 import { userRepository } from './user.repository.js';
 import { notificationService } from '../notification/notification.service.js';
 import { NotFoundError } from '../../shared/errors/index.js';
@@ -12,7 +13,7 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(userId: string, role: string, data: any) {
+  async updateProfile(userId: string, role: string, data: Prisma.UserUpdateInput) {
     const updateData = { ...data };
 
     if (role === ROLES.CUSTOMER) {
@@ -23,12 +24,12 @@ export class UserService {
     return userRepository.updateProfile(userId, updateData);
   }
 
-  async listNotifications(userId: string, query: any) {
-    const page = parseInt(query.page) || 1;
-    const limit = parseInt(query.limit) || 10;
+  async listNotifications(userId: string, query: Record<string, unknown>) {
+    const page = parseInt(query.page as string) || 1;
+    const limit = parseInt(query.limit as string) || 10;
     const isRead = query.isRead !== undefined ? query.isRead === 'true' : undefined;
 
-    const filters: any = {};
+    const filters: Prisma.NotificationWhereInput = {};
     if (isRead !== undefined) {
       filters.isRead = isRead;
     }

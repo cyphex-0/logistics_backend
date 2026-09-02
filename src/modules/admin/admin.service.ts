@@ -7,7 +7,7 @@ import { Role, ShipmentStatus } from '../../generated/prisma/index.js';
 import { AUDIT_ENTITIES, AUDIT_ACTIONS } from '../../shared/constants/audit-actions.js';
 
 export class AdminService {
-  async listUsers(query: any) {
+  async listUsers(query: Record<string, unknown>) {
     return userRepository.findManyAdmin(query);
   }
 
@@ -103,7 +103,7 @@ export class AdminService {
     });
   }
 
-  async listAuditLogs(query: any) {
+  async listAuditLogs(query: Record<string, unknown>) {
     return auditService.list(
       query,
       { page: 1, limit: 10 },

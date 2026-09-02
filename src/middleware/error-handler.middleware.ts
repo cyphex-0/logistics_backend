@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../shared/errors/index.js';
+import { AppError, ValidationError } from '../shared/errors/index.js';
 import { sendError } from '../shared/utils/response.js';
 import { logger } from '../shared/utils/logger.js';
 import { Prisma } from '../generated/prisma/index.js';
 import { ZodError } from 'zod';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+  if (err instanceof ValidationError) {
+    return sendError(res, err.statusCode, err.message, err.errors);
+  }
   if (err instanceof AppError) {
-    return sendError(res, err.statusCode, err.message, (err as any).errors);
+    return sendError(res, err.statusCode, err.message);
   }
 
   if (err instanceof ZodError) {

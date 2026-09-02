@@ -8,6 +8,7 @@ import { auditService } from '../audit/audit.service.js';
 import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-actions.js';
 import { NOTIFICATION_TYPES } from '../../shared/constants/notification-types.js';
 import { NotFoundError, BusinessRuleError } from '../../shared/errors/index.js';
+import { logger } from '../../shared/utils/logger.js';
 
 export class PaymentService {
   private getGateway(method: string) {

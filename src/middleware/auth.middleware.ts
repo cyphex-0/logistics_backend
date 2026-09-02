@@ -16,7 +16,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     let isBlacklisted = null;
     try {
       isBlacklisted = await redis.get(`bl_${token}`);
-    } catch (e) {
+    } catch {
       // Ignore redis errors for resilience
     }
     if (isBlacklisted) {
@@ -41,7 +41,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     };
 
     next();
-  } catch (error) {
+  } catch {
     next(new AuthenticationError('Authentication failed'));
   }
 }

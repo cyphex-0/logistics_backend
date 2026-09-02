@@ -1,3 +1,4 @@
+import { Prisma } from '../../generated/prisma/index.js';
 import { zoneRepository } from './zone.repository.js';
 import { auditService } from '../audit/audit.service.js';
 import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-actions.js';
@@ -11,7 +12,7 @@ export class ZoneService {
     });
   }
 
-  async create(data: any, adminId: string) {
+  async create(data: Prisma.DeliveryZoneUncheckedCreateInput, adminId: string) {
     const zone = await zoneRepository.create(data);
 
     await auditService.log({
@@ -26,7 +27,8 @@ export class ZoneService {
     return zone;
   }
 
-  async update(id: string, data: any, adminId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async update(id: string, data: Prisma.DeliveryZoneUpdateInput, _adminId: string) {
     const existing = await zoneRepository.findById(id);
     if (!existing) {
       throw new NotFoundError('Zone not found');

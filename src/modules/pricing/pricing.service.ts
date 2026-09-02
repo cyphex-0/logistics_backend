@@ -3,7 +3,7 @@ import { auditService } from '../audit/audit.service.js';
 import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-actions.js';
 import { getOrSetCache, invalidateCache } from '../../shared/utils/cache.js';
 import { BusinessRuleError } from '../../shared/errors/index.js';
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma, ServiceType } from '../../generated/prisma/index.js';
 
 export class PricingService {
   async list() {
@@ -40,16 +40,16 @@ export class PricingService {
     return rule;
   }
 
-  async calculate(destinationZoneId: string, weight: number, serviceType: any) {
+  async calculate(destinationZoneId: string, weight: number, serviceType: ServiceType) {
     const rules = await this.list();
 
     let rule = rules.find(
-      (r: any) => r.zoneId === destinationZoneId && r.serviceType === serviceType && r.isActive
+      (r: Prisma.PricingRuleGetPayload<{}>) => r.zoneId === destinationZoneId && r.serviceType === serviceType && r.isActive
     );
 
     if (!rule) {
       rule = rules.find(
-        (r: any) => r.zoneId === null && r.serviceType === serviceType && r.isActive
+        (r: Prisma.PricingRuleGetPayload<{}>) => r.zoneId === null && r.serviceType === serviceType && r.isActive
       );
     }
 

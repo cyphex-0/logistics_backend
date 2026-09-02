@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma, ServiceType } from '../../generated/prisma/index.js';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class PricingRepository {
@@ -9,7 +9,7 @@ export class PricingRepository {
     });
   }
 
-  async findByZoneAndService(zoneId: string | null, serviceType: any) {
+  async findByZoneAndService(zoneId: string | null, serviceType: ServiceType) {
     return prisma.pricingRule.findFirst({
       where: { zoneId, serviceType }
     });

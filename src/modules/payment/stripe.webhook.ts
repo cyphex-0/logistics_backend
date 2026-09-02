@@ -14,14 +14,14 @@ export const stripeWebhookHandler = async (req: Request, res: Response) => {
     const event = stripeGateway.constructEvent(req.body, sig);
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any;
+      const session = event.data.object as unknown;
       await paymentService.handleGatewayConfirmation(session.id, PaymentMethod.STRIPE);
     }
 
     // Always acknowledge receiving the event
     res.status(200).send('OK');
-  } catch (err: any) {
-    console.error('Stripe webhook error:', err.message);
-    res.status(400).send(`Webhook Error: ${err.message}`);
+  } catch (err: Error | unknown) {
+    console.error('Stripe webhook error:', (err instanceof Error ? err.message : String(err)));
+    res.status(400).send(`Webhook Error: ${(err instanceof Error ? err.message : String(err))}`);
   }
 };

@@ -53,14 +53,14 @@ app.get('/api/v1/health', async (req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     dbStatus = 'connected';
-  } catch (e) {
+  } catch {
     // Ignore error
   }
 
   try {
     await redis.ping();
     redisStatus = 'connected';
-  } catch (e) {
+  } catch {
     // Ignore error
   }
 

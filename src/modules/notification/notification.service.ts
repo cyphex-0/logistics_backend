@@ -12,14 +12,14 @@ export class NotificationService {
       type: string;
       title: string;
       message: string;
-      metadata?: any;
+      metadata?: Prisma.InputJsonValue;
     },
     tx?: Prisma.TransactionClient
   ) {
     return this.notificationRepository.create(input, tx);
   }
 
-  async listForUser(userId: string, filters: any, pagination: { page: number; limit: number }) {
+  async listForUser(userId: string, filters: Prisma.NotificationWhereInput, pagination: { page: number; limit: number }) {
     const { notifications, total } = await this.notificationRepository.listForUser(
       userId,
       filters,

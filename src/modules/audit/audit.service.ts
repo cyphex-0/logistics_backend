@@ -11,8 +11,8 @@ export class AuditService {
       entityId: string;
       action: string;
       actorId?: string;
-      oldValue?: any;
-      newValue?: any;
+      oldValue?: Prisma.InputJsonValue;
+      newValue?: Prisma.InputJsonValue;
       description?: string;
       ipAddress?: string;
     },
@@ -22,7 +22,7 @@ export class AuditService {
   }
 
   async list(
-    filters: any,
+    filters: Prisma.AuditLogWhereInput,
     pagination: { page: number; limit: number },
     sort: { sortBy: string; sortOrder: 'asc' | 'desc' }
   ) {

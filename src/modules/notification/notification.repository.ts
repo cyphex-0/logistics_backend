@@ -18,7 +18,7 @@ export class NotificationRepository {
     });
   }
 
-  async listForUser(userId: string, filters: any, pagination: { page: number; limit: number }) {
+  async listForUser(userId: string, filters: Prisma.NotificationWhereInput, pagination: { page: number; limit: number }) {
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
 

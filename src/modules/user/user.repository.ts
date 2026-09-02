@@ -68,12 +68,12 @@ export class UserRepository {
     });
   }
 
-  async findManyAdmin(query: any) {
+  async findManyAdmin(query: Record<string, unknown>) {
     const { role, isActive, page = 1, limit = 10 } = query;
     const skip = (Number(page) - 1) * Number(limit);
     const take = Number(limit);
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     if (role) where.role = role;
     if (isActive !== undefined) where.isActive = isActive === 'true';
 

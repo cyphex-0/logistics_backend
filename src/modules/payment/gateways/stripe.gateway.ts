@@ -3,11 +3,11 @@ import { env } from '../../../config/env.js';
 import { PaymentGateway } from './index.js';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia' as any
+  apiVersion: '2025-01-27.acacia' as unknown
 });
 
 export class StripeGateway implements PaymentGateway {
-  async createPayment(amount: number, currency: string, metadata: any) {
+  async createPayment(amount: number, currency: string, metadata: Record<string, string>) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [

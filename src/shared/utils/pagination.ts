@@ -1,4 +1,4 @@
-export function parsePagination(query: any): { page: number; limit: number } {
+export function parsePagination(query: Record<string, unknown>): { page: number; limit: number } {
   let page = parseInt(query.page as string, 10);
   let limit = parseInt(query.limit as string, 10);
 

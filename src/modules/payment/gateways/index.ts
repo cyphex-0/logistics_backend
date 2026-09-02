@@ -2,7 +2,7 @@ export interface PaymentGateway {
   createPayment(
     amount: number,
     currency: string,
-    metadata: any
+    metadata: Record<string, string>
   ): Promise<{ paymentUrl: string; gatewayReference: string }>;
   verifyPayment(
     gatewayReference: string
