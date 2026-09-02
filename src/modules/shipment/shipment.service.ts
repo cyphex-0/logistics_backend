@@ -27,6 +27,8 @@ export class ShipmentService {
     const destZone = zones.find((z: any) => z.id === data.destinationZoneId && z.isActive);
 
     if (!originZone || !destZone) {
+      console.error('ZONES FETCHED:', zones);
+      console.error('LOOKING FOR:', data.originZoneId, data.destinationZoneId);
       throw new BusinessRuleError('One or both delivery zones are invalid or inactive');
     }
 

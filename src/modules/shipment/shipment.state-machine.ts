@@ -18,3 +18,7 @@ export function isValidTransition(currentStatus: ShipmentStatus, newStatus: Ship
   const allowedNext = VALID_TRANSITIONS[currentStatus];
   return allowedNext.includes(newStatus);
 }
+
+export function isTerminal(status: ShipmentStatus): boolean {
+  return VALID_TRANSITIONS[status].length === 0;
+}

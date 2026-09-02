@@ -4,7 +4,8 @@ import { PrismaClient } from '../../generated/prisma/index.js';
 import { env } from '../../config/env.js';
 
 export const pool = new Pool({ connectionString: env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg({ connectionString: env.DATABASE_URL } as any);
+console.log("PRISMA ADAPTER IS: ", !!adapter);
 export const basePrisma = new PrismaClient({ adapter });
 
 export const prisma = basePrisma.$extends({

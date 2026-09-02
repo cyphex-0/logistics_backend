@@ -24,3 +24,5 @@ export class AuditRepository {
     return { logs, total };
   }
 }
+
+export const auditRepository = new AuditRepository();
