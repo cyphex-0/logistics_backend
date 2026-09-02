@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { shipmentService } from '../../src/modules/shipment/shipment.service.js';
 import { shipmentRepository } from '../../src/modules/shipment/shipment.repository.js';
@@ -69,7 +70,7 @@ describe('Concurrency Tests', () => {
 
     expect(fulfilled.length).toBe(1);
     expect(rejected.length).toBe(1);
-    expect((rejected[0] as any).reason.message).toContain('Concurrent modification');
+    expect((rejected[0] as unknown).reason.message).toContain('Concurrent modification');
   });
 
   it('handles webhook idempotency', async () => {
@@ -90,7 +91,7 @@ describe('Concurrency Tests', () => {
         data: {
           object: { id: gatewayReference, payment_status: 'paid', payment_intent: 'pi_test' }
         }
-      }) as any;
+      }) as unknown;
     stripeGateway.verifyPayment = async () => ({ status: 'PAID', transactionId: 'pi_test' });
 
     const payload = Buffer.from('test');
@@ -146,6 +147,6 @@ describe('Concurrency Tests', () => {
     // Our implementation uses `updateStatus` with `updatedAt` checking, which throws ConflictError.
     expect(fulfilled.length).toBe(1);
     expect(rejected.length).toBe(1);
-    expect((rejected[0] as any).reason.message).toContain('Concurrent modification');
+    expect((rejected[0] as unknown).reason.message).toContain('Concurrent modification');
   });
 });

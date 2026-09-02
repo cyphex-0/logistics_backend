@@ -1,3 +1,4 @@
+ 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { PricingService } from '../../src/modules/pricing/pricing.service.js';
 import { pricingRepository } from '../../src/modules/pricing/pricing.repository.js';
@@ -5,7 +6,7 @@ import { zoneRepository } from '../../src/modules/zone/zone.repository.js';
 import { BusinessRuleError } from '../../src/shared/errors/index.js';
 
 vi.mock('../../src/shared/utils/cache.js', () => ({
-  getOrSetCache: async (key: string, ttl: number, fn: any) => fn(),
+  getOrSetCache: async (key: string, ttl: number, fn: unknown) => fn(),
   invalidateCache: async () => {}
 }));
 
@@ -58,7 +59,7 @@ describe('Pricing Math', () => {
           maxWeight: 50,
           isActive: true
         }
-      ] as any;
+      ] as unknown;
     });
   });
 

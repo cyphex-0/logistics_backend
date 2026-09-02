@@ -1,3 +1,4 @@
+ 
 import { vi, describe, it, expect, beforeAll } from 'vitest';
 import { paymentService } from '../../src/modules/payment/payment.service.js';
 import { paymentRepository } from '../../src/modules/payment/payment.repository.js';
@@ -34,7 +35,7 @@ describe('Payment Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',
@@ -95,7 +96,7 @@ describe('Payment Integration Tests', () => {
     });
     await prisma.shipment.update({ where: { id: shipmentId }, data: { status: 'CONFIRMED' } });
 
-    vi.spyOn(paymentService, 'refundForShipment').mockResolvedValue(true as any); // Mock since refund depends on real stripe API setup
+    vi.spyOn(paymentService, 'refundForShipment').mockResolvedValue(true as unknown); // Mock since refund depends on real stripe API setup
 
     await shipmentService.updateStatus(
       shipmentId,

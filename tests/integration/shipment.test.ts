@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { shipmentService } from '../../src/modules/shipment/shipment.service.js';
 import { shipmentRepository } from '../../src/modules/shipment/shipment.repository.js';
 import { userRepository } from '../../src/modules/user/user.repository.js';
@@ -17,7 +18,7 @@ describe('Shipment Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',
@@ -50,7 +51,7 @@ describe('Shipment Integration Tests', () => {
 
   it('lists shipments scoped to owner', async () => {
     // customer1 should see their shipment
-    let result = await shipmentService.list({ id: mockCustomer, role: 'CUSTOMER' } as any, {
+    let result = await shipmentService.list({ id: mockCustomer, role: 'CUSTOMER' } as unknown, {
       page: 1,
       limit: 10
     });
@@ -58,7 +59,7 @@ describe('Shipment Integration Tests', () => {
     expect(result.data[0].id).toBe(shipmentId);
 
     // customer2 should not see customer1's shipment
-    result = await shipmentService.list({ id: SEED_IDS.customer2, role: 'CUSTOMER' } as any, {
+    result = await shipmentService.list({ id: SEED_IDS.customer2, role: 'CUSTOMER' } as unknown, {
       page: 1,
       limit: 10
     });
@@ -117,7 +118,7 @@ describe('Shipment Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',
@@ -151,7 +152,7 @@ describe('Shipment Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',
@@ -234,7 +235,7 @@ describe('Shipment Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',

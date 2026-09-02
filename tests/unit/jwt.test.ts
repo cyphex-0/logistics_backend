@@ -1,3 +1,4 @@
+ 
 import {
   signAccessToken,
   signRefreshToken,
@@ -6,7 +7,7 @@ import {
 } from '../../src/shared/utils/jwt.js';
 
 describe('JWT Utilities', () => {
-  const mockPayload = { userId: '123', email: 'test@test.com', role: 'CUSTOMER' as any };
+  const mockPayload = { userId: '123', email: 'test@test.com', role: 'CUSTOMER' as unknown };
 
   it('signs and verifies access token', () => {
     const token = signAccessToken(mockPayload);

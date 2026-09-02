@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { shipmentService } from '../../src/modules/shipment/shipment.service.js';
 import { paymentService } from '../../src/modules/payment/payment.service.js';
@@ -5,8 +6,8 @@ import { SEED_IDS } from '../seed-test-db.js';
 import { AppError } from '../../src/shared/errors/index.js';
 
 describe('Security Tests', () => {
-  const customer1 = { id: SEED_IDS.customer1, role: 'CUSTOMER' as any };
-  const customer2 = { id: SEED_IDS.customer2, role: 'CUSTOMER' as any };
+  const customer1 = { id: SEED_IDS.customer1, role: 'CUSTOMER' as unknown };
+  const customer2 = { id: SEED_IDS.customer2, role: 'CUSTOMER' as unknown };
 
   it('rejects IDOR: customer viewing another customers shipment', async () => {
     // Create shipment for customer 1

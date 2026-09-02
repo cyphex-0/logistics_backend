@@ -1,3 +1,4 @@
+ 
 import { adminService } from '../../src/modules/admin/admin.service.js';
 import { userRepository } from '../../src/modules/user/user.repository.js';
 import { auditRepository } from '../../src/modules/audit/audit.repository.js';
@@ -11,13 +12,13 @@ describe('Admin Integration Tests', () => {
   const mockCustomer = SEED_IDS.customer1;
 
   it('lists users successfully', async () => {
-    const result = await adminService.listUsers({ role: 'CUSTOMER' as any }, 1, 10);
+    const result = await adminService.listUsers({ role: 'CUSTOMER' as unknown }, 1, 10);
     expect(result.data.length).toBeGreaterThan(0);
     expect(result.data[0].role).toBe(Role.CUSTOMER);
   });
 
   it('updates user role and logs audit trail', async () => {
-    await adminService.updateUserRole(mockCustomer, 'COURIER' as any, mockAdmin);
+    await adminService.updateUserRole(mockCustomer, 'COURIER' as unknown, mockAdmin);
 
     const user = await userRepository.findById(mockCustomer);
     expect(user?.role).toBe(Role.COURIER);
@@ -45,7 +46,7 @@ describe('Admin Integration Tests', () => {
       customerId: mockCustomer,
       originZoneId: SEED_IDS.zone1,
       destinationZoneId: SEED_IDS.zone2,
-      serviceType: 'STANDARD' as any,
+      serviceType: 'STANDARD' as unknown,
       originAddress: 'Pickup 1',
       originCity: 'Dhaka',
       destinationAddress: 'Delivery 1',
