@@ -102,7 +102,8 @@ export class PaymentService {
         type: NOTIFICATION_TYPES.PAYMENT_CONFIRMED,
         title: 'Payment Successful',
         message: `Payment for shipment ${payment.shipment.trackingNumber} is confirmed.`,
-        metadata: { referenceId: payment.shipmentId }
+        referenceId: payment.shipmentId,
+        referenceType: 'PAYMENT'
       });
     } else if (verification.status === 'FAILED') {
       await prisma.payment.update({

@@ -12,7 +12,8 @@ export class NotificationService {
       type: string;
       title: string;
       message: string;
-      metadata?: Prisma.InputJsonValue;
+      referenceId?: string;
+      referenceType?: string;
     },
     tx?: Prisma.TransactionClient
   ) {

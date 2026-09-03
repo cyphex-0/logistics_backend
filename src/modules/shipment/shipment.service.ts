@@ -152,6 +152,7 @@ export class ShipmentService {
     }
 
     if (
+      data.status === ShipmentStatus.OUT_FOR_DELIVERY ||
       data.status === ShipmentStatus.FAILED_DELIVERY ||
       data.status === ShipmentStatus.DELIVERED
     ) {
@@ -192,6 +193,12 @@ export class ShipmentService {
       deliveryAttemptData
     );
 
+    if (!updatedShipment) {
+      throw new ConflictError(
+        'Concurrent modification detected during status update. Please try again.'
+      );
+    }
+
     await auditService.log({
       entity: AUDIT_ENTITIES.SHIPMENT,
       entityId: id,
@@ -206,7 +213,8 @@ export class ShipmentService {
       type: NOTIFICATION_TYPES.SHIPMENT_UPDATE,
       title: 'Shipment Status Updated',
       message: `Your shipment ${shipment.trackingNumber} is now ${data.status}`,
-      metadata: { referenceId: id }
+      referenceId: id,
+      referenceType: 'SHIPMENT'
     });
 
     return updatedShipment;
@@ -274,7 +282,8 @@ export class ShipmentService {
       type: NOTIFICATION_TYPES.NEW_ASSIGNMENT,
       title: 'New Pickup Assigned',
       message: `You have been assigned to pick up shipment ${shipment.trackingNumber}`,
-      metadata: { referenceId: id }
+      referenceId: id,
+      referenceType: 'SHIPMENT'
     });
 
     return updatedShipment;

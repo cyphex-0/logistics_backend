@@ -10,7 +10,8 @@ import {
   updateStatusSchema,
   updateShipmentSchema,
   assignCourierSchema,
-  cancelShipmentSchema
+  cancelShipmentSchema,
+  shipmentIdParamSchema
 } from './shipment.validation.js';
 
 export const shipmentRouter = Router();
@@ -45,7 +46,7 @@ shipmentRouter.post(
   shipmentController.assignCourier
 );
 
-shipmentRouter.get('/:id', shipmentController.getById);
+shipmentRouter.get('/:id', validate(shipmentIdParamSchema), shipmentController.getById);
 shipmentRouter.patch(
   '/:id',
   authorize(ROLES.CUSTOMER, ROLES.ADMIN),
@@ -53,4 +54,4 @@ shipmentRouter.patch(
   shipmentController.updateShipment
 );
 shipmentRouter.delete('/:id', authorize(ROLES.ADMIN), shipmentController.softDeleteShipment);
-shipmentRouter.get('/:id/tracking', shipmentController.getTrackingTimeline);
+shipmentRouter.get('/:id/tracking', validate(shipmentIdParamSchema), shipmentController.getTrackingTimeline);
