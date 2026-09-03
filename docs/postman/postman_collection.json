@@ -62,7 +62,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json(); pm.environment.set(\"customerToken\", jsonData.data.token);"
+                  "var jsonData = pm.response.json(); pm.environment.set(\"customerToken\", jsonData.data.accessToken);"
                 ],
                 "type": "text/javascript"
               }
@@ -99,7 +99,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json(); pm.environment.set(\"adminToken\", jsonData.data.token);"
+                  "var jsonData = pm.response.json(); pm.environment.set(\"adminToken\", jsonData.data.accessToken);"
                 ],
                 "type": "text/javascript"
               }
@@ -136,7 +136,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json(); pm.environment.set(\"courierToken\", jsonData.data.token);"
+                  "var jsonData = pm.response.json(); pm.environment.set(\"courierToken\", jsonData.data.accessToken);"
                 ],
                 "type": "text/javascript"
               }
@@ -501,7 +501,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"originZoneId\": \"UUID\",\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"weight\": 1\n}"
+              "raw": "{\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"weight\": 1\n}"
             }
           }
         },
@@ -587,7 +587,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"originZoneId\": \"UUID\",\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"originAddress\": \"Pickup 1\",\n  \"originCity\": \"Dhaka\",\n  \"destinationAddress\": \"Delivery 1\",\n  \"destinationCity\": \"Chittagong\",\n  \"recipientName\": \"Test Recipient\",\n  \"recipientPhone\": \"+8801700000000\",\n  \"parcel\": {\n    \"weight\": 1,\n    \"length\": 1,\n    \"width\": 1,\n    \"height\": 1,\n    \"parcelType\": \"BOX\",\n    \"description\": \"Test\"\n  }\n}"
+              "raw": "{\n  \"originZoneId\": \"UUID\",\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"originAddress\": \"Pickup 1\",\n  \"originCity\": \"Dhaka\",\n  \"destinationAddress\": \"Delivery 1\",\n  \"destinationCity\": \"Chittagong\",\n  \"recipientName\": \"Test Recipient\",\n  \"recipientPhone\": \"+8801700000000\",\n  \"parcel\": {\n    \"weight\": 1,\n    \"length\": 1,\n    \"width\": 1,\n    \"height\": 1,\n    \"description\": \"Test\"\n  }\n}"
             }
           }
         },
@@ -768,6 +768,10 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
@@ -786,6 +790,10 @@
                   "value": "UUID"
                 }
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer changed mind\"\n}"
             }
           }
         },
@@ -943,7 +951,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"paymentId\": \"UUID\"\n}"
+              "raw": "{\n  \"shipmentId\": \"UUID\",\n  \"reason\": \"Customer requested\"\n}"
             }
           }
         },
