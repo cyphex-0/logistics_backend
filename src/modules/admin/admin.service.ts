@@ -104,10 +104,23 @@ export class AdminService {
   }
 
   async listAuditLogs(query: Record<string, unknown>) {
+    const filters: Record<string, unknown> = {};
+    if (query.entity) filters.entity = query.entity;
+    if (query.action) filters.action = query.action;
+    if (query.actorId) filters.actorId = query.actorId;
+
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.min(50, Math.max(1, Number(query.limit) || 10));
+
+    const sortBy = ['createdAt', 'action', 'entity'].includes(query.sortBy as string)
+      ? (query.sortBy as string)
+      : 'createdAt';
+    const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     return auditService.list(
-      query,
-      { page: 1, limit: 10 },
-      { sortBy: 'createdAt', sortOrder: 'desc' }
+      filters,
+      { page, limit },
+      { sortBy, sortOrder }
     );
   }
 }

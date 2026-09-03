@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { adminController } from './admin.controller.js';
 import { validate } from '../../middleware/validate.middleware.js';
-import { listUsersSchema, updateRoleSchema } from './admin.validation.js';
+import { listUsersSchema, updateRoleSchema, listAuditLogsSchema } from './admin.validation.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { authorize } from '../../middleware/role.middleware.js';
 import { ROLES } from '../../shared/constants/roles.js';
@@ -21,4 +21,4 @@ adminRouter.patch('/users/:id/role', validate(updateRoleSchema), adminController
 adminRouter.delete('/users/:id', adminController.softDeleteUser);
 
 // Audit Logs
-adminRouter.get('/audit-logs', adminController.listAuditLogs);
+adminRouter.get('/audit-logs', validate(listAuditLogsSchema), adminController.listAuditLogs);
