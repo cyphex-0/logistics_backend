@@ -41,7 +41,12 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     };
 
     next();
-  } catch {
-    next(new AuthenticationError('Authentication failed'));
+  } catch (error) {
+    if (error instanceof AuthenticationError) {
+      next(error);
+    } else {
+      console.error('Auth Error:', error);
+      next(new AuthenticationError('Authentication failed'));
+    }
   }
 }
