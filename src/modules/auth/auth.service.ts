@@ -145,7 +145,6 @@ export class AuthService {
     return {
       user: publicUser,
       accessToken,
-      token: accessToken,
       refreshToken: rawRefreshToken
     };
   }
