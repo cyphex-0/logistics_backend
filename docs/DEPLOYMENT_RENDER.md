@@ -17,7 +17,7 @@ This repository includes a `render.yaml` file configured specifically for zero-d
 
 ### Build and Deploy Lifecycle
 
-- **Build Command**: `npm install && npm run db:generate && npm run build`
+- **Build Command**: `npm install --include=dev && npm run db:generate && npm run build`
   - Installs dependencies.
   - Generates the Prisma Client so it's available for the TypeScript compiler.
   - Compiles TypeScript to the `dist/` directory.
