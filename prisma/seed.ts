@@ -12,7 +12,9 @@ async function main() {
   console.log('Starting database seeding...');
 
   const { hashPassword } = await import('../src/shared/utils/hash.js');
-  const passwordHash = await hashPassword('password123');
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@example.com';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'password123';
+  const passwordHash = await hashPassword(adminPassword);
 
   // Seed Zones
   const zones = [
@@ -36,7 +38,7 @@ async function main() {
 
   // Seed Users
   const users = [
-    { email: 'admin@example.com', name: 'Admin User', role: 'ADMIN', serviceArea: null },
+    { email: adminEmail, name: 'Admin User', role: 'ADMIN', serviceArea: null },
     { email: 'customer@example.com', name: 'Demo Customer', role: 'CUSTOMER', serviceArea: null },
     { email: 'courier@example.com', name: 'Demo Courier', role: 'COURIER', serviceArea: 'Dhaka' } // Matches Dhaka zone
   ];
