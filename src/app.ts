@@ -48,6 +48,14 @@ app.use('/api/v1/pricing', pricingRouter);
 app.use('/api/v1/shipments', shipmentRouter);
 app.use('/api/v1/payments', paymentRouter);
 
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'Welcome to the Courier & Logistics Platform API! 🚀',
+    docs: 'Append /api/v1/health to check server status.'
+  });
+});
+
 app.get('/api/v1/health', async (req: Request, res: Response) => {
   let dbStatus = 'disconnected';
   let redisStatus = 'disconnected';
