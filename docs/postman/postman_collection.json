@@ -1183,6 +1183,23 @@
       "name": "System",
       "item": [
         {
+          "name": "Welcome API",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/",
+              "host": [
+                "http",
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                ""
+              ]
+            }
+          }
+        },
+        {
           "name": "Health Check",
           "request": {
             "method": "GET",
