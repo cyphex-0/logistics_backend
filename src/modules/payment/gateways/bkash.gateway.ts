@@ -52,7 +52,7 @@ export class BkashGateway implements PaymentGateway {
     const response = await this.request('POST', '/tokenized/checkout/create', {
       mode: '0011',
       payerReference: '1',
-      callbackURL: `${metadata.baseUrl}/bkash/callback`,
+      callbackURL: `${metadata.baseUrl}/payments/bkash/callback`,
       amount: amount.toString(),
       currency: 'BDT',
       intent: 'sale',
