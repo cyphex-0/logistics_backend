@@ -51,7 +51,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"New User\",\n  \"role\": \"CUSTOMER\"\n}"
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"New User\",\n  \"role\": \"CUSTOMER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -88,7 +93,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -125,7 +135,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -162,7 +177,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"courier@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"courier@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -188,7 +208,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idToken\": \"google_id_token_here\"\n}"
+              "raw": "{\n  \"idToken\": \"google_id_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -214,7 +239,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"...\"\n}"
+              "raw": "{\n  \"refreshToken\": \"...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -293,7 +323,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"+8801700000000\"\n}"
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"+8801700000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -402,7 +437,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Zone\",\n  \"city\": \"Test City\",\n  \"isActive\": true\n}"
+              "raw": "{\n  \"name\": \"Test Zone\",\n  \"city\": \"Test City\",\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -438,7 +478,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"isActive\": false\n}"
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -501,7 +546,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"weight\": 1\n}"
+              "raw": "{\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"weight\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -553,7 +603,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"serviceType\": \"STANDARD\",\n  \"basePrice\": 50,\n  \"pricePerKg\": 10,\n  \"maxWeight\": 50\n}"
+              "raw": "{\n  \"serviceType\": \"STANDARD\",\n  \"basePrice\": 50,\n  \"pricePerKg\": 10,\n  \"maxWeight\": 50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
@@ -587,7 +642,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"originZoneId\": \"UUID\",\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"originAddress\": \"Pickup 1\",\n  \"originCity\": \"Dhaka\",\n  \"destinationAddress\": \"Delivery 1\",\n  \"destinationCity\": \"Chittagong\",\n  \"recipientName\": \"Test Recipient\",\n  \"recipientPhone\": \"+8801700000000\",\n  \"parcel\": {\n    \"weight\": 1,\n    \"length\": 1,\n    \"width\": 1,\n    \"height\": 1,\n    \"description\": \"Test\"\n  }\n}"
+              "raw": "{\n  \"originZoneId\": \"UUID\",\n  \"destinationZoneId\": \"UUID\",\n  \"serviceType\": \"STANDARD\",\n  \"originAddress\": \"Pickup 1\",\n  \"originCity\": \"Dhaka\",\n  \"destinationAddress\": \"Delivery 1\",\n  \"destinationCity\": \"Chittagong\",\n  \"recipientName\": \"Test Recipient\",\n  \"recipientPhone\": \"+8801700000000\",\n  \"parcel\": {\n    \"weight\": 1,\n    \"length\": 1,\n    \"width\": 1,\n    \"height\": 1,\n    \"description\": \"Test\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -719,7 +779,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"courierId\": \"UUID\"\n}"
+              "raw": "{\n  \"courierId\": \"UUID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -756,7 +821,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"PICKED_UP\",\n  \"description\": \"Picked up from sender\"\n}"
+              "raw": "{\n  \"status\": \"PICKED_UP\",\n  \"description\": \"Picked up from sender\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -793,7 +863,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"reason\": \"Customer changed mind\"\n}"
+              "raw": "{\n  \"reason\": \"Customer changed mind\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -829,7 +904,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"recipientName\": \"New Recipient\"\n}"
+              "raw": "{\n  \"recipientName\": \"New Recipient\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -921,7 +1001,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"shipmentId\": \"UUID\",\n  \"method\": \"STRIPE\"\n}"
+              "raw": "{\n  \"shipmentId\": \"UUID\",\n  \"method\": \"STRIPE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -951,7 +1036,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"shipmentId\": \"UUID\",\n  \"reason\": \"Customer requested\"\n}"
+              "raw": "{\n  \"shipmentId\": \"UUID\",\n  \"reason\": \"Customer requested\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -978,7 +1068,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"metadata\": {\n        \"shipmentId\": \"UUID\",\n        \"paymentId\": \"UUID\"\n      }\n    }\n  }\n}"
+              "raw": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"metadata\": {\n        \"shipmentId\": \"UUID\",\n        \"paymentId\": \"UUID\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -1100,7 +1195,12 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"COURIER\",\n  \"serviceArea\": \"Dhaka\"\n}"
+              "raw": "{\n  \"role\": \"COURIER\",\n  \"serviceArea\": \"Dhaka\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
