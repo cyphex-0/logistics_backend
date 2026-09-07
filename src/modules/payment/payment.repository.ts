@@ -1,4 +1,4 @@
-import { Prisma, PaymentStatus, PaymentMethod } from '../../generated/prisma/index.js';
+import { Prisma, PaymentStatus, PaymentMethod } from '@prisma/client';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class PaymentRepository {

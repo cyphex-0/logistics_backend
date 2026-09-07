@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { trackingRepository } from './tracking.repository.js';
 import { ROLES } from '../../shared/constants/roles.js';
 

@@ -1,5 +1,5 @@
 import { prisma } from '../../shared/prisma/client.js';
-import { PaymentStatus, ShipmentStatus, PaymentMethod } from '../../generated/prisma/index.js';
+import { PaymentStatus, ShipmentStatus, PaymentMethod } from '@prisma/client';
 import { paymentRepository } from './payment.repository.js';
 import { stripeGateway } from './gateways/stripe.gateway.js';
 import { bkashGateway } from './gateways/bkash.gateway.js';

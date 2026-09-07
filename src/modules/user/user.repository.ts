@@ -1,4 +1,4 @@
-import { Prisma, Role, ShipmentStatus } from '../../generated/prisma/index.js';
+import { Prisma, Role, ShipmentStatus } from '@prisma/client';
 import { prisma, basePrisma } from '../../shared/prisma/client.js';
 
 export const PUBLIC_USER_SELECT = {

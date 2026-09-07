@@ -3,7 +3,7 @@ import { auditService } from '../audit/audit.service.js';
 import { prisma } from '../../shared/prisma/client.js';
 import { getOrSetCache } from '../../shared/utils/cache.js';
 import { NotFoundError, BusinessRuleError } from '../../shared/errors/index.js';
-import { Role, ShipmentStatus } from '../../generated/prisma/index.js';
+import { Role, ShipmentStatus } from '@prisma/client';
 import { AUDIT_ENTITIES, AUDIT_ACTIONS } from '../../shared/constants/audit-actions.js';
 
 export class AdminService {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { paymentService } from './payment.service.js';
-import { PaymentMethod } from '../../generated/prisma/index.js';
+import { PaymentMethod } from '@prisma/client';
 
 export const bkashCallbackHandler = async (req: Request, res: Response) => {
   const paymentID = req.query.paymentID as string;

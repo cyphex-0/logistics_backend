@@ -1,4 +1,4 @@
-import { ShipmentStatus } from '../../generated/prisma/index.js';
+import { ShipmentStatus } from '@prisma/client';
 
 export const VALID_TRANSITIONS: Record<ShipmentStatus, ShipmentStatus[]> = {
   [ShipmentStatus.PENDING]: [ShipmentStatus.CONFIRMED, ShipmentStatus.CANCELLED],

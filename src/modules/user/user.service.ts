@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { userRepository } from './user.repository.js';
 import { notificationService } from '../notification/notification.service.js';
 import { NotFoundError } from '../../shared/errors/index.js';

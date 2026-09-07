@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { createShipmentSchema, updateShipmentSchema, updateStatusSchema } from './shipment.validation.js';
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { shipmentRepository } from './shipment.repository.js';
 import { pricingService } from '../pricing/pricing.service.js';
 import { zoneService } from '../zone/zone.service.js';
@@ -19,7 +19,7 @@ import {
   ConflictError
 } from '../../shared/errors/index.js';
 import { ROLES } from '../../shared/constants/roles.js';
-import { ShipmentStatus, DeliveryAttemptStatus } from '../../generated/prisma/index.js';
+import { ShipmentStatus, DeliveryAttemptStatus } from '@prisma/client';
 import crypto from 'crypto';
 
 export class ShipmentService {
@@ -337,7 +337,7 @@ export class ShipmentService {
 
     if (data.destinationZoneId || (data.parcel && data.parcel.weight) || data.serviceType) {
       const result = await pricingService.calculate(destZone, weight, serviceType);
-      estimatedPrice = new (await import('../../generated/prisma/index.js')).Prisma.Decimal(
+      estimatedPrice = new (await import('@prisma/client')).Prisma.Decimal(
         result.price
       );
     }

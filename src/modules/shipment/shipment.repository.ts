@@ -1,4 +1,4 @@
-import { Prisma, ShipmentStatus } from '../../generated/prisma/index.js';
+import { Prisma, ShipmentStatus } from '@prisma/client';
 import { prisma } from '../../shared/prisma/client.js';
 
 export class ShipmentRepository {

@@ -1,7 +1,7 @@
 import { NotificationRepository } from './notification.repository.js';
 import { AuthorizationError, NotFoundError } from '../../shared/errors/index.js';
 import { buildMeta } from '../../shared/utils/pagination.js';
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 
 export class NotificationService {
   constructor(private notificationRepository: NotificationRepository) {}

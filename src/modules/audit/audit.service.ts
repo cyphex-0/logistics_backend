@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { AuditRepository } from './audit.repository.js';
 import { buildMeta } from '../../shared/utils/pagination.js';
 

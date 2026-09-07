@@ -3,7 +3,7 @@ import { auditService } from '../audit/audit.service.js';
 import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-actions.js';
 import { getOrSetCache, invalidateCache } from '../../shared/utils/cache.js';
 import { BusinessRuleError } from '../../shared/errors/index.js';
-import { Prisma, ServiceType } from '../../generated/prisma/index.js';
+import { Prisma, ServiceType } from '@prisma/client';
 
 export class PricingService {
   async list() {

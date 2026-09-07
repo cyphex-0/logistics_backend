@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { Request, Response } from 'express';
 import { stripeGateway } from './gateways/stripe.gateway.js';
 import { paymentService } from './payment.service.js';
-import { PaymentMethod } from '../../generated/prisma/index.js';
+import { PaymentMethod } from '@prisma/client';
 /**
  * Stripe Webhook Handler
  * 

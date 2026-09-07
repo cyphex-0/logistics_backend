@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError, ValidationError } from '../shared/errors/index.js';
 import { sendError } from '../shared/utils/response.js';
 import { logger } from '../shared/utils/logger.js';
-import { Prisma } from '../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

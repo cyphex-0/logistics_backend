@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import { zoneRepository } from './zone.repository.js';
 import { auditService } from '../audit/audit.service.js';
 import { AUDIT_ACTIONS, AUDIT_ENTITIES } from '../../shared/constants/audit-actions.js';
