@@ -2,8 +2,7 @@ services:
   - type: web
     name: courier-backend
     env: node
-    buildCommand: npm install --include=dev && npm run db:generate && npm run build
-    preDeployCommand: npm run db:deploy
+    buildCommand: npm install --include=dev && npm run db:generate && npm run db:deploy && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
