@@ -26,6 +26,8 @@ app.use(
   })
 );
 
+app.set('trust proxy', 1);
+
 app.post(
   '/api/v1/payments/stripe/webhook',
   express.raw({ type: 'application/json' }),

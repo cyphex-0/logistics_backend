@@ -36,3 +36,7 @@ Layered Modular Monolith (Controller → Service → Repository → Prisma → P
 *To be filled out during docs phase (Phase 14)*
 
 **Note:** Stripe and bKash payments are integrated in test/sandbox mode, fulfilling the requirement for a real gateway integration without processing real transactions.
+
+## Deployment
+
+This application is fully configured for Render. Please see the [Render Deployment Guide](docs/DEPLOYMENT_RENDER.md) for full instructions, including environment variables and infrastructure as code details (`render.yaml`).
