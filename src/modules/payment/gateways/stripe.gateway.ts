@@ -24,8 +24,8 @@ export class StripeGateway implements PaymentGateway {
         }
       ],
       mode: 'payment',
-      success_url: `http://localhost:3000/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:3000/payment/cancel`,
+      success_url: `${metadata.baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${metadata.baseUrl}/cancel`,
       client_reference_id: metadata.shipmentId,
       metadata: {
         paymentId: metadata.paymentId,

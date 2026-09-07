@@ -10,6 +10,10 @@ export const paymentRouter = Router();
 // bKash callback is a GET request sent from frontend/bKash redirect
 paymentRouter.get('/bkash/callback', bkashCallbackHandler);
 
+// Public redirects for gateway success/cancel pages
+paymentRouter.get('/success', paymentController.paymentSuccess);
+paymentRouter.get('/cancel', paymentController.paymentCancel);
+
 // Use auth middleware for the rest
 paymentRouter.use(authenticate);
 
