@@ -58,15 +58,21 @@ export class PaymentService {
     const verification = await gateway.verifyPayment(gatewayReference);
 
     if (verification.status === 'PAID') {
+      let isDuplicate = false;
       await prisma.$transaction(async (tx) => {
-        // Mark payment paid
-        await tx.payment.update({
-          where: { id: payment.id },
+        // Mark payment paid, with optimistic locking to prevent concurrent double-writes
+        const result = await tx.payment.updateMany({
+          where: { id: payment.id, status: PaymentStatus.INITIATED },
           data: {
             status: PaymentStatus.PAID,
             transactionId: verification.transactionId
           }
         });
+
+        if (result.count === 0) {
+          isDuplicate = true;
+          return;
+        }
 
         // Update shipment
         await tx.shipment.update({
@@ -95,6 +101,11 @@ export class PaymentService {
           newValue: { status: ShipmentStatus.CONFIRMED }
         });
       });
+
+      if (isDuplicate) {
+        logger.info(`Webhook idempotent skip (concurrent): Payment ${payment.id} already processed`);
+        return;
+      }
 
       // Notification outside transaction
       await notificationService.create({
