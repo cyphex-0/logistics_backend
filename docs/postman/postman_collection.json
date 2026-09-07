@@ -6,7 +6,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api/v1",
+      "value": "https://logistics-backend-jyz7.onrender.com/api/v1",
       "type": "string"
     },
     {
@@ -1287,12 +1287,13 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:3000/",
+              "raw": "https://logistics-backend-jyz7.onrender.com/",
               "host": [
-                "http",
-                "localhost"
+                "https",
+                "logistics-backend-jyz7",
+                "onrender",
+                "com"
               ],
-              "port": "3000",
               "path": [
                 ""
               ]
