@@ -21,6 +21,24 @@ export class UserController {
     }
   }
 
+  async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No image file provided' });
+      }
+      
+      const baseUrl = process.env.API_BASE_URL || (req.protocol + '://' + req.get('host'));
+      const avatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
+      
+      // Update the user with the new avatar URL
+      const result = await userService.updateProfile(req.user!.id, req.user!.role, { avatar: avatarUrl });
+      
+      return sendSuccess(res, 200, 'Avatar uploaded successfully', result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async listNotifications(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await userService.listNotifications(req.user!.id, req.query);
