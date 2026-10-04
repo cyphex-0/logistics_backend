@@ -18,7 +18,9 @@ import { stripeWebhookHandler } from './modules/payment/stripe.webhook.js';
 export const app = express();
 
 app.use(requestLogger);
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || '*',
