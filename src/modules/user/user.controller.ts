@@ -27,10 +27,12 @@ export class UserController {
         return res.status(400).json({ success: false, message: 'No image file provided' });
       }
       
-      const baseUrl = process.env.API_BASE_URL || (req.protocol + '://' + req.get('host'));
-      const avatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
+      // Convert buffer to base64 to store directly in the database
+      // This bypasses Render's ephemeral disk wiping the files on restart
+      const base64Data = req.file.buffer.toString('base64');
+      const avatarUrl = `data:${req.file.mimetype};base64,${base64Data}`;
       
-      // Update the user with the new avatar URL
+      // Update the user with the new avatar Base64 Data URI
       const result = await userService.updateProfile(req.user!.id, req.user!.role, { avatar: avatarUrl });
       
       return sendSuccess(res, 200, 'Avatar uploaded successfully', result);
