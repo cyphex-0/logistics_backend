@@ -38,8 +38,17 @@ export class ShipmentRepository {
         originZone: true,
         destinationZone: true,
         customer: { select: { id: true, name: true, phone: true } },
-        courier: { select: { id: true, name: true, phone: true } }
+        courier: { select: { id: true, name: true, phone: true } },
+        payment: { select: { status: true, method: true } }
       }
+    }).then((shipment: any) => {
+      if (!shipment) return null;
+      const { payment, ...rest } = shipment;
+      return {
+        ...rest,
+        paymentStatus: payment?.status || null,
+        paymentMethod: payment?.method || null,
+      };
     });
   }
 
@@ -56,12 +65,22 @@ export class ShipmentRepository {
         include: {
           parcel: true,
           customer: { select: { name: true } },
-          courier: { select: { name: true } }
+          courier: { select: { name: true } },
+          payment: { select: { status: true, method: true } }
         }
       })
     ]);
 
-    return { total, page, limit, data };
+    const mappedData = data.map((shipment: any) => {
+      const { payment, ...rest } = shipment;
+      return {
+        ...rest,
+        paymentStatus: payment?.status || null,
+        paymentMethod: payment?.method || null,
+      };
+    });
+
+    return { total, page, limit, data: mappedData };
   }
 
   async updateStatus(
@@ -162,3 +181,5 @@ export class ShipmentRepository {
 }
 
 export const shipmentRepository = new ShipmentRepository();
+
+
