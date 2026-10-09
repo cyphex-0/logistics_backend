@@ -123,6 +123,110 @@ export class AdminService {
       { sortBy, sortOrder }
     );
   }
+  async getRevenueReport(days: number) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const payments = await prisma.payment.findMany({
+      where: {
+        status: 'PAID',
+        createdAt: { gte: startDate }
+      },
+      select: { amount: true, createdAt: true }
+    });
+
+    const grouped = payments.reduce((acc, curr) => {
+      const date = curr.createdAt.toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + Number(curr.amount);
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(grouped)
+      .map(([date, revenue]) => ({ date, revenue }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  async getCourierPerformance() {
+    const couriers = await prisma.user.findMany({
+      where: { role: Role.COURIER },
+      select: {
+        id: true,
+        name: true,
+        serviceArea: true,
+        shipmentsAsCourier: {
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            trackingEvents: {
+              where: { status: 'DELIVERED' },
+              select: { createdAt: true },
+              take: 1
+            }
+          }
+        }
+      }
+    });
+
+    return couriers.map(c => {
+      const total = c.shipmentsAsCourier.length;
+      const delivered = c.shipmentsAsCourier.filter(s => s.status === 'DELIVERED').length;
+      const failed = c.shipmentsAsCourier.filter(s => s.status === 'FAILED_DELIVERY' || s.status === 'RETURNED').length;
+      
+      let totalDeliveryTime = 0;
+      let deliveryCount = 0;
+
+      c.shipmentsAsCourier.forEach(s => {
+        if (s.status === 'DELIVERED' && s.trackingEvents.length > 0) {
+          const deliveredAt = s.trackingEvents[0].createdAt;
+          const timeDiffHours = (deliveredAt.getTime() - s.createdAt.getTime()) / (1000 * 60 * 60);
+          totalDeliveryTime += timeDiffHours;
+          deliveryCount++;
+        }
+      });
+
+      const avgDeliveryTimeHours = deliveryCount > 0 ? (totalDeliveryTime / deliveryCount).toFixed(1) : null;
+
+      return {
+        id: c.id,
+        name: c.name,
+        serviceArea: c.serviceArea,
+        totalAssigned: total,
+        delivered,
+        failed,
+        avgDeliveryTimeHours
+      };
+    });
+  }
+
+  async exportData(type: string, startDate?: Date, endDate?: Date) {
+    const dateFilter = startDate && endDate ? { createdAt: { gte: startDate, lte: endDate } } : undefined;
+
+    switch (type) {
+      case 'shipments':
+        return prisma.shipment.findMany({
+          where: dateFilter,
+          include: { courier: { select: { name: true } }, originZone: { select: { name: true } }, destinationZone: { select: { name: true } } }
+        });
+      case 'users':
+        return prisma.user.findMany({
+          where: dateFilter,
+          select: { id: true, name: true, email: true, role: true, serviceArea: true, isActive: true, createdAt: true }
+        });
+      case 'payments':
+        return prisma.payment.findMany({
+          where: dateFilter,
+          select: { id: true, shipmentId: true, amount: true, currency: true, status: true, method: true, transactionId: true, paidAt: true, createdAt: true }
+        });
+      case 'audit-logs':
+        return prisma.auditLog.findMany({
+          where: dateFilter,
+          include: { actor: { select: { name: true, email: true } } }
+        });
+      default:
+        throw new BusinessRuleError('Invalid export type');
+    }
+  }
 }
 
 export const adminService = new AdminService();

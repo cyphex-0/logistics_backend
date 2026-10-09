@@ -22,3 +22,8 @@ adminRouter.delete('/users/:id', adminController.softDeleteUser);
 
 // Audit Logs
 adminRouter.get('/audit-logs', validate(listAuditLogsSchema), adminController.listAuditLogs);
+
+// Reports
+adminRouter.get('/reports/revenue', adminController.getRevenueReport);
+adminRouter.get('/reports/courier-performance', adminController.getCourierPerformance);
+adminRouter.get('/reports/export', adminController.exportData);

@@ -61,6 +61,36 @@ export class AdminController {
       next(e);
     }
   }
+  async getRevenueReport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string, 10) : 30;
+      const result = await adminService.getRevenueReport(days);
+      return sendSuccess(res, 200, 'Revenue report retrieved', result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getCourierPerformance(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await adminService.getCourierPerformance();
+      return sendSuccess(res, 200, 'Courier performance retrieved', result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async exportData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { type, startDate, endDate } = req.query;
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      const result = await adminService.exportData(type as string, start, end);
+      return sendSuccess(res, 200, 'Export data retrieved', result);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export const adminController = new AdminController();
