@@ -26,7 +26,8 @@ export class AdminController {
       const result = await adminService.updateUserRole(
         req.params.id as string,
         req.body.role,
-        req.user!.id
+        req.user!.id,
+        req.body.serviceArea
       );
       return sendSuccess(res, 200, 'User role updated', result);
     } catch (e) {

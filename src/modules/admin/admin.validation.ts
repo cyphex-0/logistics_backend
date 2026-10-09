@@ -12,7 +12,8 @@ export const listUsersSchema = z.object({
 
 export const updateRoleSchema = z.object({
   body: z.object({
-    role: z.nativeEnum(Role)
+    role: z.nativeEnum(Role),
+    serviceArea: z.string().optional()
   })
 });
 

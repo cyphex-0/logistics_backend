@@ -92,10 +92,13 @@ export class UserRepository {
     return { total, page: Number(page), limit: take, data };
   }
 
-  async updateRole(id: string, role: Role) {
+  async updateRole(id: string, role: Role, serviceArea?: string) {
     return prisma.user.update({
       where: { id },
-      data: { role },
+      data: { 
+        role,
+        ...(serviceArea !== undefined && { serviceArea })
+      },
       select: PUBLIC_USER_SELECT
     });
   }

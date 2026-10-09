@@ -17,24 +17,24 @@ export class AdminService {
     return user;
   }
 
-  async updateUserRole(id: string, role: Role, adminId: string) {
+  async updateUserRole(id: string, role: Role, adminId: string, serviceArea?: string) {
     const user = await userRepository.findById(id);
     if (!user) throw new NotFoundError('User not found');
 
-    if (user.role === role) {
+    if (user.role === role && user.serviceArea === serviceArea) {
       const publicUser = await userRepository.findPublicById(id);
       return publicUser;
     }
 
-    const updatedUser = await userRepository.updateRole(id, role);
+    const updatedUser = await userRepository.updateRole(id, role, serviceArea);
 
     await auditService.log({
       action: AUDIT_ACTIONS.USER_ROLE_UPDATED,
       entity: AUDIT_ENTITIES.USER,
       entityId: id,
       actorId: adminId,
-      oldValue: { role: user.role },
-      newValue: { role }
+      oldValue: { role: user.role, serviceArea: user.serviceArea },
+      newValue: { role, serviceArea }
     });
 
     return updatedUser;
