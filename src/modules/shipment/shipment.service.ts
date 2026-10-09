@@ -242,7 +242,8 @@ export class ShipmentService {
       throw new BusinessRuleError('Courier is invalid or inactive');
     }
 
-    if (courier.serviceArea?.toLowerCase() !== shipment.originZone.name.toLowerCase()) {
+    const allowedZones = courier.serviceArea?.toLowerCase().split(',').map(z => z.trim()) || [];
+    if (!allowedZones.includes(shipment.originZone.name.toLowerCase())) {
       throw new BusinessRuleError('Courier service area does not match origin zone');
     }
 
