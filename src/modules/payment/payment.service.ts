@@ -17,7 +17,7 @@ export class PaymentService {
     throw new BusinessRuleError('Unsupported payment gateway');
   }
 
-  async initiate(shipmentId: string, customerId: string, method: string, baseUrl: string) {
+  async initiate(shipmentId: string, customerId: string, method: string, baseUrl: string, successUrl?: string, cancelUrl?: string) {
     const shipment = await prisma.shipment.findUnique({ where: { id: shipmentId } });
     if (!shipment) throw new NotFoundError('Shipment not found');
     if (shipment.customerId !== customerId) throw new BusinessRuleError('Unauthorized');
@@ -31,7 +31,9 @@ export class PaymentService {
     // Call gateway to create payment session
     const { paymentUrl, gatewayReference } = await gateway.createPayment(amount, 'BDT', {
       shipmentId,
-      baseUrl
+      baseUrl,
+      successUrl: successUrl || '',
+      cancelUrl: cancelUrl || ''
     });
 
     // Save to DB

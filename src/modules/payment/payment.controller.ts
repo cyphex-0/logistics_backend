@@ -5,9 +5,9 @@ import { sendSuccess } from '../../shared/utils/response.js';
 export class PaymentController {
   async initiate(req: Request, res: Response, next: NextFunction) {
     try {
-      const { shipmentId, method } = req.body;
+      const { shipmentId, method, successUrl, cancelUrl } = req.body;
       const baseUrl = `${req.protocol}://${req.get('host')}/api/v1`;
-      const result = await paymentService.initiate(shipmentId, req.user!.id, method, baseUrl);
+      const result = await paymentService.initiate(shipmentId, req.user!.id, method, baseUrl, successUrl, cancelUrl);
       return sendSuccess(res, 200, 'Payment initiated', result);
     } catch (e) {
       next(e);
