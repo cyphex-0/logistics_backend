@@ -11,9 +11,9 @@ import {
   buildFaqSearchQuery,
   formatFaqContext,
   FALLBACK_MESSAGE_EN,
-  FALLBACK_MESSAGE_BN,
-  FaqItem
+  FALLBACK_MESSAGE_BN
 } from './support.faq.js';
+import { openRouterSupportService } from './openrouter.service.js';
 
 export class GeminiSupportService {
   private client: GoogleGenAI | null = null;
@@ -38,6 +38,11 @@ export class GeminiSupportService {
 
   /**
    * Generates a grounded customer support response.
+   * Cascade:
+   * 1. Grounding check against verified FAQs (deterministic rejection if no match).
+   * 2. Primary: Google Gemini API.
+   * 3. Secondary: OpenRouter API (google/gemma-4-31b-it:free) on Gemini error, 429 quota, or timeout.
+   * 4. Tertiary: Deterministic verified FAQ direct answer from local server memory.
    */
   async generateSupportReply(input: SupportChatInput): Promise<SupportChatResponseData> {
     const requestId = crypto.randomUUID();
@@ -55,7 +60,7 @@ export class GeminiSupportService {
     }
 
     // 3. Deterministic No-Match Fallback:
-    // When no relevant verified FAQ is found, return the predefined fallback immediately without calling Gemini
+    // When no relevant verified FAQ is found, return the predefined fallback immediately without calling any AI
     if (matchedFaqs.length === 0) {
       return {
         message: fallbackMessage,
@@ -64,19 +69,19 @@ export class GeminiSupportService {
       };
     }
 
-    // 4. Fallback when AI is disabled or API key is absent:
-    // Return the verified top matched FAQ answer directly
-    if (!this.isEnabled || !this.client) {
-      const topFaq = matchedFaqs[0];
-      const directAnswer = locale === 'bn' ? topFaq.answerBn : topFaq.answerEn;
-      return {
-        message: directAnswer,
-        requestId,
-        grounded: true
-      };
-    }
+    const topFaq = matchedFaqs[0];
+    const directFaqAnswer = locale === 'bn' ? topFaq.answerBn : topFaq.answerEn;
 
-    // 5. Construct constrained system instructions
+    // Helper to evaluate if model returned a generic fallback phrase
+    const checkIsFallback = (text: string): boolean => {
+      return (
+        text.includes(fallbackMessage) ||
+        text.includes("don't have verified information") ||
+        text.includes("যাচাইকৃত তথ্য নেই")
+      );
+    };
+
+    // 4. Construct constrained system instructions
     const faqContext = formatFaqContext(matchedFaqs, locale);
     const systemInstruction = `You are the official Shiply AI Support Assistant for the Shiply Courier & Logistics Platform.
 Answer the customer's question using EXCLUSIVELY the verified facts in the VERIFIED KNOWLEDGE BASE below.
@@ -89,6 +94,36 @@ Respond politely and concisely in the customer's language (${locale === 'bn' ? '
 === VERIFIED KNOWLEDGE BASE ===
 ${faqContext}
 ===============================`;
+
+    // 5. If primary Gemini is disabled or not initialized, try OpenRouter directly, or return direct FAQ answer
+    if (!this.isEnabled || !this.client) {
+      if (openRouterSupportService.isEnabled) {
+        try {
+          const openRouterText = await openRouterSupportService.generateSupportReply(
+            input.message,
+            systemInstruction
+          );
+          if (openRouterText) {
+            return {
+              message: openRouterText,
+              requestId,
+              grounded: !checkIsFallback(openRouterText)
+            };
+          }
+        } catch (openRouterErr) {
+          logger.warn('OpenRouter primary fallback failed; returning deterministic FAQ answer', {
+            requestId,
+            error: openRouterErr instanceof Error ? openRouterErr.message : String(openRouterErr)
+          });
+        }
+      }
+
+      return {
+        message: directFaqAnswer,
+        requestId,
+        grounded: true
+      };
+    }
 
     // 6. Invoke Gemini with a 30-second timeout guard and store: false
     try {
@@ -123,41 +158,52 @@ ${faqContext}
       const response = await Promise.race([geminiPromise, timeoutPromise]);
       const replyText = (response?.text ?? response?.output_text)?.trim();
 
-      if (!replyText) {
-        // Fallback to top matched answer if model returned empty output
-        const topFaq = matchedFaqs[0];
+      if (replyText) {
         return {
-          message: locale === 'bn' ? topFaq.answerBn : topFaq.answerEn,
+          message: replyText,
           requestId,
-          grounded: true
+          grounded: !checkIsFallback(replyText)
         };
       }
 
-      const isFallbackOutput =
-        replyText.includes(fallbackMessage) ||
-        replyText.includes("don't have verified information") ||
-        replyText.includes("যাচাইকৃত তথ্য নেই");
-
-      return {
-        message: replyText,
-        requestId,
-        grounded: !isFallbackOutput
-      };
+      logger.warn('Gemini returned empty response; attempting OpenRouter fallback', { requestId });
     } catch (err) {
-      logger.warn('Gemini support request failed; returning deterministic FAQ fallback', {
+      logger.warn('Gemini support request failed; attempting OpenRouter fallback', {
         requestId,
         error: err instanceof Error ? err.message : String(err)
       });
-
-      // Graceful provider failure: return the verified top matched FAQ answer
-      const topFaq = matchedFaqs[0];
-      return {
-        message: locale === 'bn' ? topFaq.answerBn : topFaq.answerEn,
-        requestId,
-        grounded: true
-      };
     }
+
+    // 7. Secondary Fallback: OpenRouter API (google/gemma-4-31b-it:free)
+    if (openRouterSupportService.isEnabled) {
+      try {
+        const openRouterReply = await openRouterSupportService.generateSupportReply(
+          input.message,
+          systemInstruction
+        );
+        if (openRouterReply) {
+          return {
+            message: openRouterReply,
+            requestId,
+            grounded: !checkIsFallback(openRouterReply)
+          };
+        }
+      } catch (openRouterErr) {
+        logger.warn('OpenRouter secondary fallback failed; falling back to deterministic FAQ', {
+          requestId,
+          error: openRouterErr instanceof Error ? openRouterErr.message : String(openRouterErr)
+        });
+      }
+    }
+
+    // 8. Tertiary Fallback: Direct verified FAQ answer from server memory
+    return {
+      message: directFaqAnswer,
+      requestId,
+      grounded: true
+    };
   }
 }
 
 export const geminiSupportService = new GeminiSupportService();
+

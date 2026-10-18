@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GeminiSupportService } from '../../src/modules/support/gemini.service.js';
 import { FALLBACK_MESSAGE_EN, FALLBACK_MESSAGE_BN } from '../../src/modules/support/support.faq.js';
+import { openRouterSupportService } from '../../src/modules/support/openrouter.service.js';
 
 describe('GeminiSupportService Unit Tests', () => {
   beforeEach(() => {
@@ -65,21 +66,15 @@ describe('GeminiSupportService Unit Tests', () => {
 
   it('handles provider timeout gracefully and returns top verified FAQ match', async () => {
     const service = new GeminiSupportService();
+    // Disable OpenRouter for this test to verify direct FAQ fallback
+    (openRouterSupportService as unknown as { isEnabled: boolean }).isEnabled = false;
+
     // Simulate active client with a timeout
-    const mockCreate = vi.fn().mockImplementation(() => {
-      return new Promise((resolve) => setTimeout(resolve, 15000));
-    });
-
-    (service as unknown as { client: { interactions: { create: typeof mockCreate } }; isEnabled: boolean }).client = {
-      interactions: { create: mockCreate }
-    };
-    (service as unknown as { isEnabled: boolean }).isEnabled = true;
-
-    // Fast-forward or trigger error
     const mockErrorCreate = vi.fn().mockRejectedValue(new Error('GEMINI_TIMEOUT'));
-    (service as unknown as { client: { interactions: { create: typeof mockErrorCreate } } }).client = {
+    (service as unknown as { client: { interactions: { create: typeof mockErrorCreate } }; isEnabled: boolean }).client = {
       interactions: { create: mockErrorCreate }
     };
+    (service as unknown as { isEnabled: boolean }).isEnabled = true;
 
     const result = await service.generateSupportReply({
       message: 'How do I pay for a shipment with Stripe or bKash?',
@@ -89,6 +84,59 @@ describe('GeminiSupportService Unit Tests', () => {
 
     expect(result.grounded).toBe(true);
     expect(result.message).toContain('Stripe');
+  });
+
+  it('silently falls back to OpenRouter when Gemini API fails with 429 quota exhausted', async () => {
+    const service = new GeminiSupportService();
+    // Gemini fails with 429 Quota Exhausted
+    const mockGeminiError = vi.fn().mockRejectedValue(new Error('429 Resource has been exhausted (e.g. check quota).'));
+    (service as unknown as { client: { interactions: { create: typeof mockGeminiError } }; isEnabled: boolean }).client = {
+      interactions: { create: mockGeminiError }
+    };
+    (service as unknown as { isEnabled: boolean }).isEnabled = true;
+
+    // OpenRouter succeeds
+    (openRouterSupportService as unknown as { isEnabled: boolean }).isEnabled = true;
+    const mockOpenRouter = vi.spyOn(openRouterSupportService, 'generateSupportReply').mockResolvedValue(
+      'Gemma 4 generated: Shiply accepts card payments through Stripe and mobile payments via bKash.'
+    );
+
+    const result = await service.generateSupportReply({
+      message: 'How do I pay for a shipment?',
+      history: [],
+      locale: 'en'
+    });
+
+    expect(result.grounded).toBe(true);
+    expect(result.message).toBe('Gemma 4 generated: Shiply accepts card payments through Stripe and mobile payments via bKash.');
+    expect(mockOpenRouter).toHaveBeenCalledTimes(1);
+
+    mockOpenRouter.mockRestore();
+  });
+
+  it('silently falls back to verified FAQ when both Gemini and OpenRouter fail', async () => {
+    const service = new GeminiSupportService();
+    // Gemini fails
+    const mockGeminiError = vi.fn().mockRejectedValue(new Error('Gemini outage'));
+    (service as unknown as { client: { interactions: { create: typeof mockGeminiError } }; isEnabled: boolean }).client = {
+      interactions: { create: mockGeminiError }
+    };
+    (service as unknown as { isEnabled: boolean }).isEnabled = true;
+
+    // OpenRouter also fails (e.g. upstream 429 rate limit)
+    (openRouterSupportService as unknown as { isEnabled: boolean }).isEnabled = true;
+    const mockOpenRouter = vi.spyOn(openRouterSupportService, 'generateSupportReply').mockResolvedValue(null);
+
+    const result = await service.generateSupportReply({
+      message: 'What does In Transit mean?',
+      history: [],
+      locale: 'en'
+    });
+
+    expect(result.grounded).toBe(true);
+    expect(result.message).toContain('moving between hubs');
+
+    mockOpenRouter.mockRestore();
   });
 
   it('invokes Gemini interactions.create with store: false and without client-supplied assistant turns', async () => {
@@ -129,3 +177,4 @@ describe('GeminiSupportService Unit Tests', () => {
     expect(callArgs.system_instruction).toContain('Shiply');
   });
 });
+
