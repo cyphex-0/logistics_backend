@@ -42,9 +42,11 @@ export const FAQ_KNOWLEDGE_BASE: FaqItem[] = [
       'শিপলিতে পার্সেল বুক করার নিয়ম: ১. আপনার অ্যাকাউন্টে লগইন করুন। ২. ড্যাশবোর্ড থেকে "Book Shipment"-এ যান। ৩. পিকআপ এবং ডেলিভারি জোন নির্বাচন করে ঠিকানা ও ফোন নম্বর প্রদান করুন। ৪. স্ট্যান্ডার্ড বা এক্সপ্রেস সার্ভিস নির্বাচন করুন। ৫. নির্ধারিত ফি দেখে স্ট্রাইপ (Stripe) বা বিকাশ (bKash)-এর মাধ্যমে পেমেন্ট সম্পন্ন করুন।',
     keywords: [
       'create', 'book', 'booking', 'shipment', 'parcel', 'package', 'send',
-      'order', 'step', 'steps', 'process', 'বুক', 'পাঠাব', 'পাঠাতে', 'পার্সেল', 'তৈরি'
+      'order', 'step', 'steps', 'process', 'ship', 'shipping', 'how to ship',
+      'deliver', 'delivery', 'courier', 'send parcel', 'send package',
+      'বুক', 'পাঠাব', 'পাঠাতে', 'পার্সেল', 'তৈরি', 'শিপ', 'শিপিং'
     ],
-    tags: ['shipment', 'booking', 'order']
+    tags: ['shipment', 'booking', 'order', 'shipping']
   },
   {
     id: 'status-definitions',
@@ -259,6 +261,18 @@ export function scoreFaqItem(item: FaqItem, text: string): number {
   for (const tag of item.tags) {
     if (tokens.includes(tag.toLowerCase())) {
       score += 3;
+    }
+  }
+
+  // Check token stem/prefix match against keywords for words with length >= 4
+  for (const token of tokens) {
+    if (token.length >= 4) {
+      for (const kw of item.keywords) {
+        if (kw.length >= 4 && (kw.startsWith(token) || token.startsWith(kw))) {
+          score += 2;
+          break;
+        }
+      }
     }
   }
 
