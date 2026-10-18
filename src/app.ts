@@ -13,6 +13,7 @@ import { zoneRouter } from './modules/zone/zone.routes.js';
 import { pricingRouter } from './modules/pricing/pricing.routes.js';
 import { shipmentRouter } from './modules/shipment/shipment.routes.js';
 import { paymentRouter } from './modules/payment/payment.routes.js';
+import { supportRouter } from './modules/support/support.routes.js';
 import { stripeWebhookHandler } from './modules/payment/stripe.webhook.js';
 
 export const app = express();
@@ -51,6 +52,7 @@ app.use('/api/v1/zones', zoneRouter);
 app.use('/api/v1/pricing', pricingRouter);
 app.use('/api/v1/shipments', shipmentRouter);
 app.use('/api/v1/payments', paymentRouter);
+app.use('/api/v1/support', supportRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
