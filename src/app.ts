@@ -54,6 +54,48 @@ app.use('/api/v1/shipments', shipmentRouter);
 app.use('/api/v1/payments', paymentRouter);
 app.use('/api/v1/support', supportRouter);
 
+const handleGetPublicStats = async (req: Request, res: Response) => {
+  try {
+    const [totalShipments, deliveredShipments, totalDeliveryAttempts] = await Promise.all([
+      prisma.shipment.count({ where: { deletedAt: null } }),
+      prisma.shipment.count({ where: { status: 'DELIVERED', deletedAt: null } }),
+      prisma.deliveryAttempt.findMany({
+        where: { shipment: { status: 'DELIVERED', deletedAt: null } },
+        select: { shipmentId: true }
+      })
+    ]);
+
+    let onTimeRate = 0;
+    if (deliveredShipments > 0) {
+      const attemptsCountMap: Record<string, number> = {};
+      for (const attempt of totalDeliveryAttempts) {
+        attemptsCountMap[attempt.shipmentId] = (attemptsCountMap[attempt.shipmentId] || 0) + 1;
+      }
+      const onTimeDeliveries = Object.values(attemptsCountMap).filter(count => count <= 1).length;
+      onTimeRate = Math.round((onTimeDeliveries / deliveredShipments) * 100);
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalShipments,
+        deliveredShipments,
+        onTimeRate,
+        countries: 0,
+        tracking: '24/7'
+      }
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve platform statistics'
+    });
+  }
+};
+
+app.get('/api/v1/stats', handleGetPublicStats);
+app.get('/api/v1/public/stats', handleGetPublicStats);
+
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
