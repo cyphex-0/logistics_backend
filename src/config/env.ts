@@ -17,7 +17,14 @@ const envSchema = z.object({
   BKASH_APP_SECRET: z.string().min(1),
   BKASH_USERNAME: z.string().min(1),
   BKASH_PASSWORD: z.string().min(1),
-  GOOGLE_CLIENT_ID: z.string().min(1)
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-3.8-flash'),
+  AI_SUPPORT_ENABLED: z
+    .string()
+    .default('true')
+    .transform((val) => val === 'true'),
+  SUPPORT_EMAIL: z.string().email().optional()
 });
 
 const _env = envSchema.safeParse(process.env);
