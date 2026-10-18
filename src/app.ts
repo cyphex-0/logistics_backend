@@ -81,7 +81,7 @@ const handleGetPublicStats = async (req: Request, res: Response) => {
         totalShipments,
         deliveredShipments,
         onTimeRate,
-        countries: 0,
+        countries: 1,
         tracking: '24/7'
       }
     });
