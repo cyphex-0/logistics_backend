@@ -44,11 +44,17 @@ export class GeminiSupportService {
     const locale = input.locale || 'en';
     const fallbackMessage = locale === 'bn' ? FALLBACK_MESSAGE_BN : FALLBACK_MESSAGE_EN;
 
-    // 1. Build search query from current message + recent user turns (anti-spoofing: excludes assistant turns)
-    const searchQuery = buildFaqSearchQuery(input.message, input.history);
-    const matchedFaqs = selectRelevantFaq(searchQuery, 3);
+    // 1. First, search the current user message directly
+    // This ensures a newly asked topic (e.g. pricing) is never overshadowed by older conversation history
+    let matchedFaqs = selectRelevantFaq(input.message, 3);
 
-    // 2. Deterministic No-Match Fallback:
+    // 2. If no direct match from the current message, search with bounded user history (for short follow-ups)
+    if (matchedFaqs.length === 0 && input.history && input.history.length > 0) {
+      const searchQuery = buildFaqSearchQuery(input.message, input.history);
+      matchedFaqs = selectRelevantFaq(searchQuery, 3);
+    }
+
+    // 3. Deterministic No-Match Fallback:
     // When no relevant verified FAQ is found, return the predefined fallback immediately without calling Gemini
     if (matchedFaqs.length === 0) {
       return {
@@ -58,7 +64,7 @@ export class GeminiSupportService {
       };
     }
 
-    // 3. Fallback when AI is disabled or API key is absent:
+    // 4. Fallback when AI is disabled or API key is absent:
     // Return the verified top matched FAQ answer directly
     if (!this.isEnabled || !this.client) {
       const topFaq = matchedFaqs[0];
@@ -70,7 +76,7 @@ export class GeminiSupportService {
       };
     }
 
-    // 4. Construct constrained system instructions
+    // 5. Construct constrained system instructions
     const faqContext = formatFaqContext(matchedFaqs, locale);
     const systemInstruction = `You are the official Shiply AI Support Assistant for the Shiply Courier & Logistics Platform.
 Answer the customer's question using EXCLUSIVELY the verified facts in the VERIFIED KNOWLEDGE BASE below.
@@ -84,10 +90,10 @@ Respond politely and concisely in the customer's language (${locale === 'bn' ? '
 ${faqContext}
 ===============================`;
 
-    // 5. Invoke Gemini with a 10-second timeout guard and store: false
+    // 6. Invoke Gemini with a 30-second timeout guard and store: false
     try {
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 10000);
+        setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 30000);
       });
 
       const geminiPromise = this.client.interactions.create({
