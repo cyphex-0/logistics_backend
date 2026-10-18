@@ -76,9 +76,25 @@ export const FAQ_KNOWLEDGE_BASE: FaqItem[] = [
     keywords: [
       'price', 'pricing', 'rate', 'rates', 'cost', 'fee', 'charge', 'charges',
       'calculate', 'calculation', 'express', 'standard', 'weight', 'kg',
+      'how much', 'shipping cost', 'delivery cost',
       'দাম', 'খরচ', 'চার্জ', 'হিসাব', 'টাকা', 'রেট', 'মূল্য'
     ],
     tags: ['pricing', 'rate', 'cost', 'fee']
+  },
+  {
+    id: 'cancellation-refund',
+    category: 'booking',
+    questionEn: 'Can I cancel a shipment and get a refund?',
+    answerEn:
+      'Yes. You can cancel a shipment from your customer dashboard as long as it has not yet been picked up by a courier (in PENDING or CONFIRMED status). If you already paid online via Stripe or bKash, an automated refund will be initiated back to your original payment method in accordance with standard gateway processing timelines.',
+    questionBn: 'শিপমেন্ট বাতিল করা এবং রিফান্ড পাওয়া কি সম্ভব?',
+    answerBn:
+      'হ্যাঁ। কুরিয়ার পার্সেল সংগ্রহ করার পূর্ব পর্যন্ত (PENDING বা CONFIRMED স্ট্যাটাসে) আপনি আপনার ড্যাশবোর্ড থেকে শিপমেন্ট বাতিল করতে পারবেন। আপনি যদি স্ট্রাইপ বা বিকাশে আগেই পেমেন্ট করে থাকেন, তবে স্বয়ংক্রিয়ভাবে আপনার পূর্বের পেমেন্ট মাধ্যমে রিফান্ড প্রক্রিয়া শুরু হবে।',
+    keywords: [
+      'cancel', 'cancellation', 'refund', 'money back', 'return payment',
+      'বাতিল', 'রিফান্ড', 'টাকা ফেরত'
+    ],
+    tags: ['cancellation', 'refund', 'booking']
   },
   {
     id: 'payment-methods',
