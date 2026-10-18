@@ -1,9 +1,9 @@
- 
+import { describe, it, expect } from 'vitest';
 import {
   isValidTransition,
   isTerminal
 } from '../../src/modules/shipment/shipment.state-machine.js';
-import { ShipmentStatus } from '../../src/generated/prisma/index.js';
+import { ShipmentStatus } from '@prisma/client';
 
 describe('Shipment State Machine', () => {
   describe('isValidTransition', () => {
