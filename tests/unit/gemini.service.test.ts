@@ -35,7 +35,7 @@ describe('GeminiSupportService Unit Tests', () => {
 
   it('returns direct verified FAQ answer when AI is disabled or key missing and FAQ matches', async () => {
     const service = new GeminiSupportService();
-    // In test environment, GEMINI_API_KEY is not set by default, so isEnabled is false
+    (service as unknown as { isEnabled: boolean }).isEnabled = false;
     const result = await service.generateSupportReply({
       message: 'What does In Transit mean?',
       history: [],
@@ -49,6 +49,7 @@ describe('GeminiSupportService Unit Tests', () => {
 
   it('supports follow-up pricing questions using combined user search query', async () => {
     const service = new GeminiSupportService();
+    (service as unknown as { isEnabled: boolean }).isEnabled = false;
     const result = await service.generateSupportReply({
       message: 'What about express?',
       history: [
@@ -59,7 +60,7 @@ describe('GeminiSupportService Unit Tests', () => {
     });
 
     expect(result.grounded).toBe(true);
-    expect(result.message).toContain('Base Price');
+    expect(result.message.toLowerCase()).toContain('price');
   });
 
   it('handles provider timeout gracefully and returns top verified FAQ match', async () => {

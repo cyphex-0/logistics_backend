@@ -126,6 +126,22 @@ export const FAQ_KNOWLEDGE_BASE: FaqItem[] = [
       'reach', 'email', 'form', 'যোগাযোগ', 'সাহায্য', 'হেল্প', 'সাপোর্ট'
     ],
     tags: ['support', 'contact', 'help']
+  },
+  {
+    id: 'account-privacy',
+    category: 'support',
+    questionEn: 'Can this AI assistant access my personal account or shipment information?',
+    answerEn:
+      'No. This AI assistant is strictly designed for general platform guidance and cannot view, access, or modify your personal account information, passwords, payment details, or private shipment records. You can view and manage your account securely by logging in to your [Customer Dashboard](/dashboard) or [Profile](/profile).',
+    questionBn: 'এই এআই সহকারী কি আমার ব্যক্তিগত অ্যাকাউন্ট বা শিপমেন্টের তথ্য দেখতে পারে?',
+    answerBn:
+      'না। এই এআই সহকারী শুধুমাত্র প্ল্যাটফর্মের সাধারণ সহায়তার জন্য তৈরি এবং এটি আপনার ব্যক্তিগত অ্যাকাউন্ট, পাসওয়ার্ড, পেমেন্ট বা গোপন শিপমেন্ট তথ্যে প্রবেশ করতে পারে না। আপনার অ্যাকাউন্ট পরিচালনা করতে আপনার [ড্যাশবোর্ড](/dashboard) বা [প্রোফাইলে](/profile) যান।',
+    keywords: [
+      'account', 'profile', 'personal', 'private', 'access', 'privacy',
+      'password', 'security', 'data', 'info', 'information', 'আমার অ্যাকাউন্ট',
+      'অ্যাকাউন্ট তথ্য', 'ব্যক্তিগত তথ্য'
+    ],
+    tags: ['account', 'privacy', 'security']
   }
 ];
 

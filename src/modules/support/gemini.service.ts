@@ -96,19 +96,32 @@ ${faqContext}
         setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 30000);
       });
 
-      const geminiPromise = this.client.interactions.create({
-        model: this.modelName,
-        system_instruction: systemInstruction,
-        input: input.message, // Current message only; no client-supplied model turns
-        store: false, // Explicitly opt out of server-side interaction storage
-        generation_config: {
-          temperature: 0.2,
-          max_output_tokens: 500
-        }
-      });
+      let geminiPromise: Promise<{ text?: string; output_text?: string }>;
+      if (this.client.models?.generateContent) {
+        geminiPromise = this.client.models.generateContent({
+          model: this.modelName,
+          contents: input.message,
+          config: {
+            systemInstruction,
+            temperature: 0.2,
+            maxOutputTokens: 500
+          }
+        });
+      } else {
+        geminiPromise = this.client.interactions.create({
+          model: this.modelName,
+          system_instruction: systemInstruction,
+          input: input.message, // Current message only; no client-supplied model turns
+          store: false, // Explicitly opt out of server-side interaction storage
+          generation_config: {
+            temperature: 0.2,
+            max_output_tokens: 500
+          }
+        });
+      }
 
       const response = await Promise.race([geminiPromise, timeoutPromise]);
-      const replyText = response?.output_text?.trim();
+      const replyText = (response?.text ?? response?.output_text)?.trim();
 
       if (!replyText) {
         // Fallback to top matched answer if model returned empty output
@@ -120,10 +133,15 @@ ${faqContext}
         };
       }
 
+      const isFallbackOutput =
+        replyText.includes(fallbackMessage) ||
+        replyText.includes("don't have verified information") ||
+        replyText.includes("যাচাইকৃত তথ্য নেই");
+
       return {
         message: replyText,
         requestId,
-        grounded: true
+        grounded: !isFallbackOutput
       };
     } catch (err) {
       logger.warn('Gemini support request failed; returning deterministic FAQ fallback', {
