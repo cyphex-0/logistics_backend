@@ -8,10 +8,17 @@ import {
 } from './support.validation.js';
 import {
   selectRelevantFaq,
+  selectRelevantFaqWithContext,
   buildFaqSearchQuery,
   formatFaqContext,
   FALLBACK_MESSAGE_EN,
-  FALLBACK_MESSAGE_BN
+  FALLBACK_MESSAGE_BN,
+  GREETING_RESPONSE_EN,
+  GREETING_RESPONSE_BN,
+  GRATITUDE_RESPONSE_EN,
+  GRATITUDE_RESPONSE_BN,
+  isGreeting,
+  isGratitude
 } from './support.faq.js';
 import { openRouterSupportService } from './openrouter.service.js';
 
@@ -49,14 +56,33 @@ export class GeminiSupportService {
     const locale = input.locale || 'en';
     const fallbackMessage = locale === 'bn' ? FALLBACK_MESSAGE_BN : FALLBACK_MESSAGE_EN;
 
-    // 1. First, search the current user message directly
+    // 1. Recognize standalone greetings and salutations
+    if (isGreeting(input.message)) {
+      return {
+        message: locale === 'bn' ? GREETING_RESPONSE_BN : GREETING_RESPONSE_EN,
+        requestId,
+        grounded: true
+      };
+    }
+
+    // 2. Recognize expressions of gratitude / polite closing
+    if (isGratitude(input.message)) {
+      return {
+        message: locale === 'bn' ? GRATITUDE_RESPONSE_BN : GRATITUDE_RESPONSE_EN,
+        requestId,
+        grounded: true
+      };
+    }
+
+    // 3. First, search the current user message directly
     // This ensures a newly asked topic (e.g. pricing) is never overshadowed by older conversation history
     let matchedFaqs = selectRelevantFaq(input.message, 3);
 
-    // 2. If no direct match from the current message, search with bounded user history (for short follow-ups)
+    // 4. If no direct match from the current message, search with bounded user history (for short follow-ups)
+    // Guarded: requires the current message to contribute signal to prevent topic bleed
     if (matchedFaqs.length === 0 && input.history && input.history.length > 0) {
       const searchQuery = buildFaqSearchQuery(input.message, input.history);
-      matchedFaqs = selectRelevantFaq(searchQuery, 3);
+      matchedFaqs = selectRelevantFaqWithContext(searchQuery, input.message, 3);
     }
 
     // 3. Deterministic No-Match Fallback:

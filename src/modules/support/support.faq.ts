@@ -17,6 +17,19 @@ export const FALLBACK_MESSAGE_EN =
 export const FALLBACK_MESSAGE_BN =
   "দুঃখিত, এই বিষয়ে আমার কাছে যাচাইকৃত তথ্য নেই। বিস্তারিত সহায়তা পেতে অনুগ্রহ করে আমাদের সাপোর্ট পেইজে যোগাযোগ করুন: /contact";
 
+export const GREETING_RESPONSE_EN =
+  'Hello! I am your Shiply AI Support Assistant. How can I help you today with booking shipments, calculating delivery rates, tracking parcels, or platform coverage?';
+
+export const GREETING_RESPONSE_BN =
+  'হ্যালো! আমি আপনার শিপলি এআই সহকারী। পার্সেল বুকিং, শিপিং খরচ হিসাব, পার্সেল ট্র্যাকিং বা সার্ভিস কভারেজ বিষয়ে কীভাবে আপনাকে সাহায্য করতে পারি?';
+
+export const GRATITUDE_RESPONSE_EN =
+  "You're very welcome! Please feel free to ask if you have any more questions about Shiply.";
+
+export const GRATITUDE_RESPONSE_BN =
+  'আপনাকে অনেক ধন্যবাদ! শিপলি সম্পর্কিত যেকোনো সহায়তায় আমি সবসময় প্রস্তুত।';
+
+
 export const FAQ_KNOWLEDGE_BASE: FaqItem[] = [
   {
     id: 'booking-flow',
@@ -158,6 +171,55 @@ export function buildFaqSearchQuery(message: string, history: SupportChatMessage
   return [...recentUserTurns, message].join(' ').trim();
 }
 
+export function isGreeting(text: string): boolean {
+  if (!text) return false;
+  const trimmed = text.trim().toLowerCase().replace(/[^\w\s\u0980-\u09FF]/g, '');
+  const greetingExact = new Set([
+    'hi',
+    'hello',
+    'hey',
+    'heya',
+    'hey there',
+    'hello there',
+    'greetings',
+    'good morning',
+    'good afternoon',
+    'good evening',
+    'good day',
+    'salam',
+    'assalamu alaikum',
+    'assalamualaikum',
+    'হাই',
+    'হ্যালো',
+    'সালাম',
+    'আসসালামু আলাইকুম',
+    'আসসালামুআলাইকুম',
+    'নমস্কার',
+    'কেমন আছেন'
+  ]);
+  return greetingExact.has(trimmed);
+}
+
+export function isGratitude(text: string): boolean {
+  if (!text) return false;
+  const trimmed = text.trim().toLowerCase().replace(/[^\w\s\u0980-\u09FF]/g, '');
+  const gratitudeExact = new Set([
+    'thanks',
+    'thank you',
+    'thank u',
+    'thx',
+    'thanks a lot',
+    'thank you so much',
+    'many thanks',
+    'ধন্যবাদ',
+    'অনেক ধন্যবাদ',
+    'অসংখ্য ধন্যবাদ',
+    'থ্যাংকস',
+    'শুকরিয়া'
+  ]);
+  return gratitudeExact.has(trimmed);
+}
+
 const STOP_WORDS = new Set([
   'a', 'an', 'the', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could',
   'will', 'would', 'should', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him',
@@ -168,6 +230,56 @@ const STOP_WORDS = new Set([
 ]);
 
 /**
+ * Calculates a match score for a single FAQ item against a query string.
+ */
+export function scoreFaqItem(item: FaqItem, text: string): number {
+  if (!text || !text.trim()) return 0;
+
+  const normalized = text.toLowerCase();
+  const tokens = normalized
+    .replace(/[^\w\s\u0980-\u09FF]/g, ' ')
+    .split(/\s+/)
+    .filter((t) => t.length >= 2 && !STOP_WORDS.has(t));
+
+  if (tokens.length === 0) {
+    return 0;
+  }
+
+  let score = 0;
+
+  // Check exact keyword matches (primary signal)
+  for (const kw of item.keywords) {
+    const lowerKw = kw.toLowerCase();
+    if (normalized.includes(lowerKw)) {
+      score += lowerKw.includes(' ') ? 4 : 2;
+    }
+  }
+
+  // Check tag matches
+  for (const tag of item.tags) {
+    if (tokens.includes(tag.toLowerCase())) {
+      score += 3;
+    }
+  }
+
+  // Check meaningful question token matches
+  const questionTokensEn = item.questionEn
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => !STOP_WORDS.has(t));
+  const questionTokensBn = item.questionBn
+    .split(/\s+/)
+    .filter((t) => !STOP_WORDS.has(t));
+
+  for (const token of tokens) {
+    if (questionTokensEn.includes(token)) score += 1;
+    if (questionTokensBn.includes(token)) score += 1;
+  }
+
+  return score;
+}
+
+/**
  * Selects relevant FAQ items based on keyword and tag relevance scoring.
  * Returns an empty array if no relevance threshold is met.
  */
@@ -176,50 +288,10 @@ export function selectRelevantFaq(searchQuery: string, limit = 3): FaqItem[] {
     return [];
   }
 
-  const normalized = searchQuery.toLowerCase();
-  const tokens = normalized
-    .replace(/[^\w\s\u0980-\u09FF]/g, ' ')
-    .split(/\s+/)
-    .filter((t) => t.length >= 2 && !STOP_WORDS.has(t));
-
-  if (tokens.length === 0) {
-    return [];
-  }
-
-  const scored = FAQ_KNOWLEDGE_BASE.map((item) => {
-    let score = 0;
-
-    // Check exact keyword matches (primary signal)
-    for (const kw of item.keywords) {
-      const lowerKw = kw.toLowerCase();
-      if (normalized.includes(lowerKw)) {
-        score += lowerKw.includes(' ') ? 4 : 2;
-      }
-    }
-
-    // Check tag matches
-    for (const tag of item.tags) {
-      if (tokens.includes(tag.toLowerCase())) {
-        score += 3;
-      }
-    }
-
-    // Check meaningful question token matches
-    const questionTokensEn = item.questionEn
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((t) => !STOP_WORDS.has(t));
-    const questionTokensBn = item.questionBn
-      .split(/\s+/)
-      .filter((t) => !STOP_WORDS.has(t));
-
-    for (const token of tokens) {
-      if (questionTokensEn.includes(token)) score += 1;
-      if (questionTokensBn.includes(token)) score += 1;
-    }
-
-    return { item, score };
-  });
+  const scored = FAQ_KNOWLEDGE_BASE.map((item) => ({
+    item,
+    score: scoreFaqItem(item, searchQuery)
+  }));
 
   const matches = scored
     .filter((s) => s.score >= 2) // Require a meaningful score threshold
@@ -229,6 +301,38 @@ export function selectRelevantFaq(searchQuery: string, limit = 3): FaqItem[] {
 
   return matches;
 }
+
+/**
+ * Searches with historical conversation context, requiring that the CURRENT user message
+ * also has a relevant signal (score >= 1) in the matched FAQ to prevent historical topic bleed.
+ */
+export function selectRelevantFaqWithContext(
+  searchQuery: string,
+  currentMessage: string,
+  limit = 3
+): FaqItem[] {
+  if (!searchQuery || !searchQuery.trim()) {
+    return [];
+  }
+
+  const scored = FAQ_KNOWLEDGE_BASE.map((item) => {
+    const currentScore = scoreFaqItem(item, currentMessage);
+    const combinedScore = scoreFaqItem(item, searchQuery);
+    return {
+      item,
+      currentScore,
+      combinedScore
+    };
+  });
+
+  return scored
+    // Must have at least score >= 1 from the current message, and combined score >= 2
+    .filter((s) => s.currentScore >= 1 && s.combinedScore >= 2)
+    .sort((a, b) => b.combinedScore - a.combinedScore)
+    .slice(0, limit)
+    .map((s) => s.item);
+}
+
 
 /**
  * Formats matched FAQ items into a delimited markdown string for system instructions.

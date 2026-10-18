@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
   selectRelevantFaq,
+  selectRelevantFaqWithContext,
   buildFaqSearchQuery,
   formatFaqContext,
   FALLBACK_MESSAGE_EN,
-  FALLBACK_MESSAGE_BN
+  FALLBACK_MESSAGE_BN,
+  isGreeting,
+  isGratitude
 } from '../../src/modules/support/support.faq.js';
 import { SupportChatMessage } from '../../src/modules/support/support.validation.js';
 
@@ -117,4 +120,53 @@ describe('Support FAQ Knowledge Base & Matcher', () => {
     expect(FALLBACK_MESSAGE_EN).toContain('/contact');
     expect(FALLBACK_MESSAGE_BN).toContain('/contact');
   });
+
+  it('recognizes various English and Bangla greetings', () => {
+    expect(isGreeting('hi')).toBe(true);
+    expect(isGreeting('Hello!')).toBe(true);
+    expect(isGreeting('hey')).toBe(true);
+    expect(isGreeting('Good morning')).toBe(true);
+    expect(isGreeting('হাই')).toBe(true);
+    expect(isGreeting('হ্যালো!')).toBe(true);
+    expect(isGreeting('আসসালামু আলাইকুম')).toBe(true);
+
+    // Queries with actual content are not just greetings
+    expect(isGreeting('Hi, how much is delivery?')).toBe(false);
+  });
+
+  it('recognizes various English and Bangla expressions of gratitude', () => {
+    expect(isGratitude('thanks')).toBe(true);
+    expect(isGratitude('Thank you so much!')).toBe(true);
+    expect(isGratitude('ধন্যবাদ')).toBe(true);
+    expect(isGratitude('অনেক ধন্যবাদ!')).toBe(true);
+
+    expect(isGratitude('Thank you, but what is the price?')).toBe(false);
+  });
+
+  it('prevents historical topic bleed on unrelated messages using selectRelevantFaqWithContext', () => {
+    const history: SupportChatMessage[] = [
+      { role: 'user', content: 'can you access my this account information' }
+    ];
+
+    const unrelatedMessage = 'who is the president of france';
+    const combinedQuery = buildFaqSearchQuery(unrelatedMessage, history);
+
+    // Contextual selection requires current message to contribute signal to the FAQ
+    const matches = selectRelevantFaqWithContext(combinedQuery, unrelatedMessage);
+    expect(matches).toEqual([]);
+  });
+
+  it('allows valid follow-up queries that share keywords with the category', () => {
+    const history: SupportChatMessage[] = [
+      { role: 'user', content: 'How is shipping calculated?' }
+    ];
+
+    const followUp = 'What about express?';
+    const combinedQuery = buildFaqSearchQuery(followUp, history);
+
+    const matches = selectRelevantFaqWithContext(combinedQuery, followUp);
+    expect(matches.length).toBeGreaterThan(0);
+    expect(matches[0].category).toBe('pricing');
+  });
 });
+
