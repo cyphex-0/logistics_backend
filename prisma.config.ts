@@ -5,7 +5,7 @@ export default defineConfig({
   earlyAccess: true,
   schema: './prisma/schema.prisma',
   datasource: {
-    url: env('DATABASE_URL')
+    url: process.env.DIRECT_URL || env('DATABASE_URL')
   },
   migrations: {
     seed: 'npx tsx prisma/seed.ts'
